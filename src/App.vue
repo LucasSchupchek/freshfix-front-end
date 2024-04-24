@@ -1,0 +1,18 @@
+<template>
+  <v-app theme="light">
+    <Header v-show="auth.isAuthenticated"/>
+    <Sidebar :permission="auth.permission" v-show="auth.isAuthenticated"/>
+    <router-view/>
+  </v-app>
+</template>
+
+<script setup>
+import { useAuth } from '@/stores/auth.js'
+import { useRouter } from 'vue-router';
+
+import Sidebar from './components/Sidebar.vue';
+import Header from './components/Header.vue';
+ 
+const auth = useAuth();
+
+</script>
