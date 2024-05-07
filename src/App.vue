@@ -8,11 +8,9 @@
 
 <script setup>
 import { useAuth } from '@/stores/auth.js'
-import { useRouter } from 'vue-router';
 
 import Sidebar from './components/Sidebar.vue';
 import Header from './components/Header.vue';
- 
 const auth = useAuth();
 
 </script>
