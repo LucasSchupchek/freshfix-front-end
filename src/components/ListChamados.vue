@@ -33,7 +33,7 @@
     </div>
     <v-expansion-panels>
       <v-expansion-panel v-for="(chamado, index) in filteredChamados" v-bind:key="index">
-        <v-expansion-panel-title>
+        <v-expansion-panel-title v-bind:class="{ 'panel-title-open': chamadoOpen }">
           <v-row no-gutters>
             <v-col class="d-flex justify-start" cols="4" style="margin-bottom: 2%;"> <h3> {{chamado.titulo}} </h3> </v-col>
             <v-col class="d-flex justify-end" cols="8">
@@ -44,8 +44,88 @@
             </v-col>
           </v-row>
         </v-expansion-panel-title>
-        <v-expansion-panel-text>
+        <v-expansion-panel-text @click="chamadoOpen = !chamadoOpen">
           <v-row no-gutters>
+            <v-col cols="5">
+              <v-row no-gutters>
+                <v-col cols="5">
+                  <v-row no-gutters>
+                    <p> Criado por </p>
+                  </v-row>
+                  <v-row no-gutters>
+                    <div class="user-info">
+                      <p class="bold-text">{{ chamado.usuario }}</p>
+                      <p class="bold-text">{{ chamado.email_usuario }}</p>
+                      <p class="bold-text">{{ chamado.setor_usuario }}</p>
+                    </div>
+                  </v-row>
+                </v-col>
+                <v-col cols="5">
+                  <v-row no-gutters>
+                    <p> Técnico Responsável </p>
+                  </v-row>
+                  <v-row no-gutters>
+                    <div class="user-info">
+                      <p class="bold-text">{{ chamado.responsavel }}</p>
+                      <p class="bold-text">{{ chamado.email_responsavel }}</p>
+                    </div>
+                  </v-row>
+                </v-col>
+              </v-row>
+              <br>
+              <v-row no-gutters>
+                <v-col cols="3">
+                  <v-row>
+                    <v-col>
+                      <p class="categoria-text"> Categoria </p>
+                      <v-chip color="primary" label> {{chamado.descricao_categoria}} </v-chip>
+                    </v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="9">
+                  <p> Anexos </p>
+                  <div class="icon-container">
+                    <v-row v-if="chamado.anexos.length > 0">
+                      <v-col>
+                        <v-row no-gutters>
+                          <template v-for="(anexo, index) in chamado.anexos" v-bind:key="index">
+                            <v-btn icon @click="downloadAttachment(anexo)" style="margin-right: 2%;">
+                              <v-icon>mdi-file</v-icon>
+                            </v-btn>
+                          </template>
+                        </v-row>
+                      </v-col>
+                    </v-row>
+                  </div>
+                </v-col>
+              </v-row>
+              <br>
+              <v-row no-gutters>
+                 <v-col cols="11">
+                   <v-row>
+                     <v-col class="d-flex justify-end" v-if="!chamado.responsavel && grant()">
+                       <v-chip v-if="grant()" class="ma-0" color="red" @click="negarChamado(chamado.id)" style="margin-right: 3% !important;">Negar</v-chip>
+                       <v-chip v-if="grant()" class="ma-0" color="green" @click="atribuirChamado(chamado.id)">Atribuir</v-chip>
+                     </v-col>
+                     <v-col v-if="chamado.responsavel && grant()">
+                       <v-select
+                         :items="mudarStatusChamado"
+                         label="Status"
+                         density="compact"
+                         variant="solo"
+                         v-model="novoStatus"
+                         @update:modelValue="atualizarStatus(chamado.id)"
+                       ></v-select>
+                     </v-col>
+                   </v-row>
+                 </v-col>
+               </v-row>
+            </v-col>
+            <v-col cols="7">
+              <Chat :chamado_id="chamado.id"/>
+            </v-col>
+          </v-row>
+          <!-- <v-row no-gutters>
             <v-col cols="3">
               <v-row>
                 <v-col>
@@ -122,7 +202,7 @@
             <v-col cols="9">
               <Chat :chamado_id="chamado.id"/>
             </v-col>
-          </v-row>
+          </v-row> -->
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -272,7 +352,13 @@ export default {
 };
 </script>
   
-<style scoped>  
+<style scoped>
+.icon-container {
+  width: 100%;
+  overflow-x: auto; /* Adiciona rolagem horizontal se os ícones ultrapassarem o limite */
+  white-space: nowrap; /* Impede que os ícones quebrem para uma nova linha */
+}
+
 .search{
   margin-top: 3%;
   margin-bottom: 1%;
@@ -291,6 +377,18 @@ export default {
 
 .datas_chamado{
   font-size: 13px;
+}
+
+.panel-title-open {
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Adicione o estilo do box shadow conforme necessário */
+}
+
+.bold-text {
+  font-weight: bold;
+}
+
+.user-info {
+  max-width: 100%;
 }
 </style>
   
