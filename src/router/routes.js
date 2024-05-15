@@ -3,13 +3,14 @@ import { useAuth } from "@/stores/auth.js";
 export default async function routes(to, from, next) {
   if (to.meta?.auth) {
     const auth = useAuth();
-    console.log(auth.user)
     if (auth.token && auth.user) {
       const isAuthenticated = auth.checkToken();
-      console.log(isAuthenticated)
       if (isAuthenticated){
         if (!to.meta.grants || hasRequiredGrants(auth.permission, to.meta.grants)) {
           next();
+          if(auth.permission == 'default'){
+            next({ name: "meusChamados" });
+          }
         } else {
           next({ name: "naoPermitido" });
         }

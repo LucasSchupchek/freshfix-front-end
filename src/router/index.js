@@ -6,16 +6,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('../views/NovoChamado.vue'),
-      meta: {
-        auth:true
-      }
-    },
-    {
-      path: '/NovoChamado',
-      name: 'NovoChamado',
-      component: () => import('../views/NovoChamado.vue'),
+      name: '',
+      component: () => import('../views/DashboardView.vue'),
       meta: {
         auth:true
       }
@@ -42,6 +34,20 @@ const router = createRouter({
       component: () => import('../views/MeusChamados.vue'),
       meta: {
         auth:true
+      }
+    },
+    {
+      path: '/chamadosTecnicos',
+      name: 'chamadosTecnicos',
+      component: () => import('../views/chamadosTecnicos.vue'),
+      meta: {
+        auth:true,
+        grants: [
+          'admin',
+          'supervisor',
+          'analista',
+          'tecnico'
+        ]
       }
     },
     {

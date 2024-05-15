@@ -12,6 +12,7 @@
     "core-js": "^3.37.0",
     "pinia": "^2.1.7",
     "roboto-fontface": "*",
+    "socket.io-client": "^4.7.5",
     "vue": "^3.4.0",
     "vue-router": "^4.3.0",
     "vuetify": "^3.5.0"
