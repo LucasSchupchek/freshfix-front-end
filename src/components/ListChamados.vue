@@ -32,7 +32,7 @@
       </div>
     </div>
     <v-expansion-panels>
-      <v-expansion-panel v-for="(chamado, index) in filteredChamados" v-bind:key="index">
+      <v-expansion-panel class="panel-spacing" v-for="(chamado, index) in filteredChamados" v-bind:key="index">
         <v-expansion-panel-title v-bind:class="{ 'panel-title-open': chamadoOpen }">
           <v-row no-gutters>
             <v-col class="d-flex justify-start" cols="4" style="margin-bottom: 2%;"> <h3> {{chamado.titulo}} </h3> </v-col>
@@ -216,7 +216,6 @@ import http from '@/services/http.js';
 const auth = useAuth();
 const bearer = `Bearer ${auth.token}`;
 import Chat from './Chat.vue';
-import io from 'socket.io-client';
 
 export default {
   name: "ListChamados",
@@ -353,6 +352,10 @@ export default {
 </script>
   
 <style scoped>
+.panel-spacing {
+  margin-bottom: 20px; /* ou qualquer valor que você preferir */
+}
+
 .icon-container {
   width: 100%;
   overflow-x: auto; /* Adiciona rolagem horizontal se os ícones ultrapassarem o limite */

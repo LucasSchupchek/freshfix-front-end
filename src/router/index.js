@@ -51,6 +51,20 @@ const router = createRouter({
       }
     },
     {
+      path: '/usuarios',
+      name: 'usuarios',
+      component: () => import('../views/Usuarios.vue'),
+      meta: {
+        auth:true,
+        grants: [
+          'admin',
+          'supervisor',
+          'analista',
+          'tecnico'
+        ]
+      }
+    },
+    {
       path: '/naoPermitido',
       name: 'naoPermitido',
       component: () => import('../views/naoPermitido.vue'),
