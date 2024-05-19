@@ -55,6 +55,7 @@ import { isDrawerOpen } from '@/stores/stores';
 import { useAuth } from '@/stores/auth.js'
 import { createPinia } from 'pinia'
 import { useRouter } from 'vue-router';
+import { watch } from 'vue';
 
 export default {
   name: "Header",
@@ -73,13 +74,23 @@ export default {
         console.error("Router não está disponível.");
       }
     };
+
+    // Aqui está o bloco de watch
+    watch(auth.isAuthenticated, (newValue) => {
+      if (!newValue) {
+        // Se o usuário não estiver autenticado, feche a barra lateral
+        isDrawerOpen.value = false;
+      }
+    });
+
     return {
       isDrawerOpen,
       logout
     }
-  }
+  },
 };
 </script>
+
 
 <style scoped>
 

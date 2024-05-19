@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 import routes from '@/router/routes.js';
 
 const router = createRouter({
@@ -6,10 +6,9 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: '',
-      component: () => import('../views/DashboardView.vue'),
+      redirect: '/dashboard', // Redireciona a rota padrão para uma rota autenticada
       meta: {
-        auth:true
+        auth: true
       }
     },
     {
@@ -22,10 +21,8 @@ const router = createRouter({
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
       meta: {
-        auth:true,
-        grants: [
-          'admin'
-        ]
+        auth: true,
+        grants: ['admin']
       }
     },
     {
@@ -33,7 +30,7 @@ const router = createRouter({
       name: 'meusChamados',
       component: () => import('../views/MeusChamados.vue'),
       meta: {
-        auth:true
+        auth: true
       }
     },
     {
@@ -41,13 +38,8 @@ const router = createRouter({
       name: 'chamadosTecnicos',
       component: () => import('../views/chamadosTecnicos.vue'),
       meta: {
-        auth:true,
-        grants: [
-          'admin',
-          'supervisor',
-          'analista',
-          'tecnico'
-        ]
+        auth: true,
+        grants: ['admin', 'supervisor', 'analista', 'tecnico']
       }
     },
     {
@@ -55,13 +47,17 @@ const router = createRouter({
       name: 'usuarios',
       component: () => import('../views/Usuarios.vue'),
       meta: {
-        auth:true,
-        grants: [
-          'admin',
-          'supervisor',
-          'analista',
-          'tecnico'
-        ]
+        auth: true,
+        grants: ['admin', 'supervisor', 'analista', 'tecnico']
+      }
+    },
+    {
+      path: '/setores',
+      name: 'setores',
+      component: () => import('../views/Setores.vue'),
+      meta: {
+        auth: true,
+        grants: ['admin', 'supervisor', 'analista', 'tecnico']
       }
     },
     {
@@ -69,12 +65,12 @@ const router = createRouter({
       name: 'naoPermitido',
       component: () => import('../views/naoPermitido.vue'),
       meta: {
-        auth:true
+        auth: true
       }
     }
   ]
-})
+});
 
 router.beforeEach(routes);
 
-export default router
+export default router;

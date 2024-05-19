@@ -5,5 +5,5 @@
   </template>
   
   <script setup>
-  import ListUsers from '../components/ListUsers.vue';
+  import ListUsers from './UserTable.vue';
   </script>
