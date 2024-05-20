@@ -91,13 +91,13 @@ export default {
     const itemsPerPage = ref(10);
     const headers = [
       { title: 'Nome', align: 'start', key: 'nome' },
-      { title: 'Sobrenome', key: 'sobrenome', align: 'end' },
-      { title: 'Email', key: 'email', align: 'end' },
-      { title: 'Username', key: 'username', align: 'end' },
-      { title: 'Nível de Acesso', key: 'nivel_acesso', align: 'end' },
-      { title: 'Setor', key: 'setor', align: 'end' },
-      { title: 'Cargo', key: 'cargo', align: 'end' },
-      { title: 'Ativo', key: 'ativo', align: 'end' },
+      { title: 'Sobrenome', key: 'sobrenome', align: 'start' },
+      { title: 'Email', key: 'email', align: 'start' },
+      { title: 'Username', key: 'username', align: 'start' },
+      { title: 'Nível de Acesso', key: 'nivel_acesso', align: 'start' },
+      { title: 'Setor', key: 'setor', align: 'start' },
+      { title: 'Cargo', key: 'cargo', align: 'start' },
+      { title: 'Ativo', key: 'ativo', align: 'start' },
       { title: 'Ações', key: 'actions', align: 'end' },
     ];
 

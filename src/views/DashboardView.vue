@@ -3,16 +3,6 @@
     <v-container>
       <h1>Dashboard</h1>
       <v-row no-gutters class="dashboard_shadow">
-        <v-col>
-          <v-card class="text-center square-card">
-            <div class="card-content">10 USUÁRIOS</div>
-          </v-card>
-          <v-card class="mt-4 text-center square-card">
-            <div class="card-content">3 TÉCNICOS</div>
-          </v-card>
-        </v-col>
-
-        <v-spacer></v-spacer>
         <v-col cols="6">
           <v-card class="chart-container">
             <v-chip-group v-model="selectedFilter" class="mb-4">
@@ -22,18 +12,15 @@
           </v-card>
         </v-col>
 
-        <v-spacer></v-spacer>
-        <v-col>
-          <v-card class="text-center square-card">
+        <v-col cols="6">
+          <v-card class="chart-container">
             <div class="card-content">
-              <DoughnutChart />
+              <PieChart />
             </div>
-          </v-card>
-          <v-card class="mt-4 text-center square-card">
-            <div class="card-content">50 CHAMADOS</div>
           </v-card>
         </v-col>
       </v-row>
+
       <h1>Equipe</h1>
       <v-row no-gutters class="dashboard_shadow">
         <HorizontalBarChart />
@@ -50,7 +37,7 @@
 import { useAuth } from '@/stores/auth.js'
 import { computed } from 'vue'
 import BarChart from '../components/BarChart'
-import DoughnutChart from '../components/DoughnutChart'
+import PieChart from '../components/PieChart'
 import HorizontalBarChart from '../components/HorizontalBarChart'
 import LogList from '../components/LogList'
 
@@ -58,7 +45,7 @@ import LogList from '../components/LogList'
 export default {
   components: {
     BarChart,
-    DoughnutChart,
+    PieChart,
     HorizontalBarChart,
     LogList
   },

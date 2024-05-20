@@ -61,6 +61,24 @@ const router = createRouter({
       }
     },
     {
+      path: '/cargos',
+      name: 'cargos',
+      component: () => import('../views/Cargos.vue'),
+      meta: {
+        auth: true,
+        grants: ['admin', 'supervisor', 'analista', 'tecnico']
+      }
+    },
+    {
+      path: '/categoria',
+      name: 'categoria',
+      component: () => import('../views/Categoria.vue'),
+      meta: {
+        auth: true,
+        grants: ['admin', 'supervisor', 'analista', 'tecnico']
+      }
+    },
+    {
       path: '/naoPermitido',
       name: 'naoPermitido',
       component: () => import('../views/naoPermitido.vue'),

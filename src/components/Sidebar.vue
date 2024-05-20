@@ -12,8 +12,8 @@
 
         <v-list-item link to="usuarios" prepend-icon="mdi-account-circle" title="Usuários"></v-list-item>
         <v-list-item link to="setores" prepend-icon="mdi mdi-cog" title="Setores" v-show="permissao == 'admin' || permissao == 'supervisor'"></v-list-item>
-        <v-list-item link to="" prepend-icon="mdi mdi-cog" title="Cargos"></v-list-item>
-        <v-list-item link to="" prepend-icon="mdi mdi-cog" title="Categorias"></v-list-item>
+        <v-list-item link to="cargos" prepend-icon="mdi mdi-cog" title="Cargos"></v-list-item>
+        <v-list-item link to="categoria" prepend-icon="mdi mdi-cog" title="Categorias"></v-list-item>
       </v-list-group>
     </v-list>
     <!-- <router-link to="NovoChamado"> -->
