@@ -36,7 +36,7 @@ const router = createRouter({
     {
       path: '/chamadosTecnicos',
       name: 'chamadosTecnicos',
-      component: () => import('../views/chamadosTecnicos.vue'),
+      component: () => import('../views/Chamados.vue'),
       meta: {
         auth: true,
         grants: ['admin', 'supervisor', 'analista', 'tecnico']

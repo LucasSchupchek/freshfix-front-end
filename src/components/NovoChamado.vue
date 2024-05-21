@@ -71,21 +71,21 @@ export default {
     const descricao = ref(''); // Definindo a variável descricao
 
     const listarCategorias = async () => {
-      try {
-        const response = await http.get('/categorias', {
-          headers: {
-            Authorization: bearer
-          }
-        });
-        categoriaOptions.value = response.data.result.map(categoria => ({
-          id: categoria.id,
-          descricao: categoria.descricao
-        }));
-        console.log(categoriaOptions)
-      } catch(error) {
-        console.log(error.response.data);
-      }
-    };
+    try {
+      const response = await http.get('/categorias', {
+        headers: {
+          Authorization: bearer
+        }
+      });
+      categoriaOptions.value = response.data.result.data.map(categoria => ({
+        id: categoria.id,
+        descricao: categoria.descricao
+      }));
+      console.log(categoriaOptions)
+    } catch(error) {
+      console.log(error.response.data);
+    }
+  };
 
     const fecharDialog = () => {
       emit('fechar-dialog');

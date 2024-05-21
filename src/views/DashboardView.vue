@@ -8,14 +8,14 @@
             <v-chip-group v-model="selectedFilter" class="mb-4">
               <v-chip v-for="filter in filters" :key="filter" :value="filter">{{ filter }}</v-chip>
             </v-chip-group>
-            <BarChart :filter="selectedFilter" />
+            <BarChart :filter="selectedFilter"/>
           </v-card>
         </v-col>
 
         <v-col cols="6">
           <v-card class="chart-container">
             <div class="card-content">
-              <PieChart />
+              <DoughnutChart />
             </div>
           </v-card>
         </v-col>
@@ -34,40 +34,42 @@
 </template>
 
 <script>
-import { useAuth } from '@/stores/auth.js'
-import { computed } from 'vue'
+import { ref } from 'vue';
 import BarChart from '../components/BarChart'
-import PieChart from '../components/PieChart'
+import DoughnutChart from '../components/DoughnutChart'
 import HorizontalBarChart from '../components/HorizontalBarChart'
 import LogList from '../components/LogList'
+import { useAuth } from '@/stores/auth.js';
 
+const auth = useAuth();
+const bearer = `Bearer ${auth.token}`;
 
 export default {
   components: {
     BarChart,
-    PieChart,
+    DoughnutChart,
     HorizontalBarChart,
     LogList
   },
-  data() {
-    return {
-      selectedFilter: 'Categorias',
-      filters: ['Categorias', 'Setor'],
-      logs: []
-    }
-  },
-  methods: {
-    addLog(user, action) {
-      this.logs.push({
+  setup() {
+    const selectedFilter = ref('Categorias')
+    const filters = ref(['Categorias', 'Setor'])
+    const logs = ref([])
+
+    const addLog = (user, action) => {
+      logs.value.push({
         user,
         action,
         timestamp: new Date().toLocaleString()
-      });
+      })
     }
-  },
-  mounted() {
-    this.addLog('Usuário X', 'Ação realizada');
 
+    return {
+      selectedFilter,
+      filters,
+      logs,
+      addLog
+    }
   }
 }
 </script>
