@@ -17,12 +17,12 @@
       </v-list-group>
     </v-list>
     <!-- <router-link to="NovoChamado"> -->
-      <v-dialog v-model="dialog" max-width="750" persistent>
+      <!-- <v-dialog v-model="dialog" max-width="750" persistent>
         <template v-slot:activator="{ props: activatorProps }">
           <v-btn class="novo-chamado-button" color="primary" v-bind="activatorProps">Novo Chamado</v-btn>
         </template>
         <NovoChamado :dialog="dialog" @fechar-dialog="fecharDialog"/>
-      </v-dialog>
+      </v-dialog> -->
     <!-- </router-link> -->
   </v-navigation-drawer>
 </template>

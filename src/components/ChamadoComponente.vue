@@ -1,153 +1,182 @@
 <template>
-    <v-card>
-      <v-card-title>{{ isEdit ? 'Editar Categoria' : 'Cadastrar Categoria' }}</v-card-title>
-      <v-card-text>
-        <v-form ref="form" v-model="isFormValid">
-          <v-text-field
-            v-model="categoriaCopy.descricao"
-            label="Descrição"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="categoriaCopy.cor"
-            label="Cor"
-            readonly
-            append-icon="mdi-palette"
-            @click:append="colorPickerVisible = true"
-          ></v-text-field>
-          <v-dialog
-            v-model="colorPickerVisible"
-            persistent
-            max-width="350px"
-            draggable
-          >
-            <v-card>
-              <v-card-title>
-                <span class="headline">Selecionar Cor</span>
-              </v-card-title>
-              <v-card-text>
-                <v-color-picker v-model="categoriaCopy.cor" flat></v-color-picker>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text @click="colorPickerVisible = false">Cancelar</v-btn>
-                <v-btn color="primary" @click="colorPickerVisible = false">OK</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-form>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text @click="fecharDialog">Cancelar</v-btn>
-        <v-btn color="primary" @click="salvar" :loading="loading">Salvar</v-btn>
-      </v-card-actions>
-    </v-card>
-  </template>
-  
-  <script>
-  import { ref, watch, onMounted } from 'vue';
-  import http from '@/services/http.js';
-  import { useAuth } from '@/stores/auth.js';
-  
-  export default {
-    name: 'CadastroCategoria',
-    props: {
-      dialog: Boolean,
-      isEdit: Boolean,
-      categoria: Object,
+  <v-container class="custom-container">
+    <h2>Chamados</h2>
+    <v-row v-if="dashOrders.length">
+      <v-col cols="4">
+        <v-card class="ma-2" :color="getStatusColor(dashOrders[0].status)" dark>
+          <v-card-text>{{ dashOrders[0].total }} Chamados em Aberto</v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="4">
+        <v-card class="ma-2" :color="getStatusColor(dashOrders[1].status)" dark>
+          <v-card-text>{{ dashOrders[1].total }} Chamados em Andamento</v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="4">
+        <v-card class="ma-2" :color="getStatusColor(dashOrders[2].status)" dark>
+          <v-card-text>{{ dashOrders[2].total }} Chamados Fechados</v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <v-dialog v-model="dialog" max-width="750" persistent>
+          <template v-slot:activator="{ props: activatorProps }">
+            <v-btn class="novo-chamado-button" color="primary" v-bind="activatorProps">Novo Chamado</v-btn>
+          </template>
+          <NovoChamado :dialog="dialog" @fechar-dialog="fecharDialog"/>
+        </v-dialog>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <v-text-field v-model="search" label="Search" prepend-inner-icon="mdi-magnify" outlined dense></v-text-field>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <v-data-table
+          :headers="headers"
+          :items="orders"
+          :search="search"
+          class="elevation-0 no-borders"
+        >
+          <template v-slot:[`item.status`]="{ item }">
+            <v-chip :color="getStatusColor(item.status)" dark>{{ item.status }}</v-chip>
+          </template>
+          <template v-slot:[`item.action`]="{ item }">
+              <v-icon @click="openEditDialog(item)" color="primary">mdi-pencil</v-icon>
+            </template>
+        </v-data-table>
+        <v-dialog v-model="isEditDialogOpen" max-width="600" persistent>
+          <Chamado :dialog="isEditDialogOpen" :Chamado="selectedchamado"/>
+        </v-dialog>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+
+<script>
+import NovoChamado from './NovoChamado.vue';
+import Chamado from './Chamado.vue';
+import http from '@/services/http.js';
+import { useAuth } from '@/stores/auth.js';
+const auth = useAuth();
+const bearer = `Bearer ${auth.token}`;
+
+export default {
+  props: {
+    loadChamados: {
+      type: Function,
+      required: true,
     },
-    setup(props, { emit }) {
-      const auth = useAuth();
-      const bearer = `Bearer ${auth.token}`;
-      const loading = ref(false);
-      const isFormValid = ref(false);
-      const form = ref(null);
-      const colorPickerVisible = ref(false);
-      const categoriaCopy = ref({
-        descricao: '',
-        cor: '#FFFFFF' // Valor padrão para a cor
-      });
-  
-      const rules = {
-        required: value => !!value || 'Este campo é obrigatório',
-      };
-  
-      const fecharDialog = () => {
-        emit('fechar-dialog');
-      };
-  
-      watch(() => props.categoria, (newCategoria) => {
-        if (newCategoria) {
-          categoriaCopy.value = { ...newCategoria };
-        }
-      });
-  
-      onMounted(() => {
-        if (props.categoria) {
-          categoriaCopy.value = { ...props.categoria };
-        }
-      });
-  
-      const salvar = async () => {
-        form.value.validate();
-        if (!isFormValid.value) {
-          alert('Por favor, preencha todos os campos obrigatórios corretamente.');
-          return;
-        }
-        console.log('Categoria:', JSON.stringify(categoriaCopy.value));
-        loading.value = true;
-        try {
-          if (props.isEdit) {
-            await http.put(`/categoria/${props.categoria.id}`, categoriaCopy.value, {
-              headers: { Authorization: bearer }
-            });
-          } else {
-            await http.post('/categoria', categoriaCopy.value, {
-              headers: { Authorization: bearer }
-            });
-          }
-          fecharDialog();
-          emit('categoria-salvo');
-        } catch (error) {
-          console.error('Erro ao salvar categoria:', error);
-          alert(`Erro ao salvar categoria: ${error.response?.data?.error || error.message}`);
-        } finally {
-          loading.value = false;
-        }
-      };
-  
-      const getContrastingColor = (hexColor) => {
-        if (!hexColor) return '#000000';
-        hexColor = hexColor.replace('#', '');
-        const r = parseInt(hexColor.substring(0, 2), 16);
-        const g = parseInt(hexColor.substring(2, 4), 16);
-        const b = parseInt(hexColor.substring(4, 6), 16);
-        const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-        return yiq >= 128 ? '#000000' : '#FFFFFF';
-      };
-  
-      return {
-        loading,
-        isFormValid,
-        rules,
-        form,
-        fecharDialog,
-        salvar,
-        categoriaCopy,
-        colorPickerVisible,
-        getContrastingColor
-      };
+    loadDadosDashboard: {
+      type: Function,
+      required: true,
     },
-  };
-  </script>
-  
-  <style scoped>
-  .full-width {
-    width: 100%;
+  },
+  components: {
+    NovoChamado,
+    Chamado
+  },
+  data() {
+    return {
+      dialog: false,
+      search: '',
+      headers: [
+        { title: 'ID', key: 'id' },
+        { title: 'Título', key: 'titulo' },
+        { title: 'Descrição', key: 'descricao' },
+        { title: 'Status', key: 'status' },
+        { title: 'Data de Cadastro', key: 'data_cadastro' },
+        { title: 'Data de Atualização', key: 'data_update' },
+        { title: 'Data de Fechamento', key: 'data_fechamento' },
+        { title: 'Ação', key: 'action' }
+      ],
+      orders: [],
+      dashOrders: []
+    };
+  },
+  async created() {
+    this.orders = await this.loadChamados();
+    this.dashOrders = await this.loadDadosDashboard();
+  },
+  methods: {
+    fecharDialog() {
+      this.dialog = false;
+      this.recarregarChamados();
+    },
+    async recarregarChamados() {
+      this.orders = await this.loadChamados();
+    },
+    async openEditDialog(item) {
+    try {
+      // Realize a requisição para obter os dados completos do chamado
+      const response = await http.get(`/chamado/${item.id}`, {
+        headers: {
+          Authorization: bearer
+        }
+      });
+
+      // Verifique se a requisição foi bem-sucedida
+      if (response.data && response.data.result) {
+        // Se a requisição for bem-sucedida, abra o diálogo e passe os dados do chamado como parâmetro
+        if (this.$refs.chamadoCompleto) {
+          this.$refs.chamadoCompleto.carregarChamado(response.data.result);
+        } else {
+          console.error('Erro: Componente Chamado não montado.');
+        }
+        this.dialog = true;
+      } else {
+        // Se a requisição falhar ou não retornar os dados esperados, exiba uma mensagem de erro
+        console.error('Erro ao obter os dados do chamado:', response.data.error);
+      }
+    } catch (error) {
+      // Se ocorrer um erro durante a requisição, exiba uma mensagem de erro
+      console.error('Erro ao obter os dados do chamado:', error);
+    }
+  },
+    getStatusColor(status) {
+      switch (status) {
+        case 'Aguardando Feedback': return 'blue';
+        case 'Pendente': return 'orange';
+        case 'Rejeitado': return 'red';
+        case 'Aberto': return 'blue';
+        case 'Em andamento': return 'orange';
+        case 'Fechado': return 'green';
+        default: return 'gray';
+      }
+    },
   }
-  .mb-2 {
-    margin-bottom: 16px;
-  }
-  </style>
-  
+};
+</script>
+
+<style scoped>
+.custom-container {
+  border-radius: 13px;
+  padding: 16px;
+  background-color: #ffffff;
+}
+
+.ma-2 {
+  margin: 8px !important;
+}
+
+.v-data-table {
+  margin-top: 16px;
+}
+
+.no-borders .v-data-table-header th,
+.no-borders .v-data-table tbody tr {
+  border: none !important;
+}
+
+.no-borders .v-data-table-header {
+  border-bottom: none !important;
+}
+
+.no-borders .v-data-table-header th {
+  border-bottom: none !important;
+}
+</style>

@@ -6,12 +6,14 @@
 
 // Plugins
 import { registerPlugins } from '@/plugins'
+import './global.css';
 
 // Components
 import App from './App.vue'
 
 // Composables
 import { createApp } from 'vue'
+
 
 const app = createApp(App)
 

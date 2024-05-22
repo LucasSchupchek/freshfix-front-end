@@ -1,0 +1,9 @@
+/* global.css */
+
+body {
+    background-color: rgb(240, 242, 245);
+}
+
+.v-application {
+    background-color: rgb(240, 242, 245) !important;
+}
