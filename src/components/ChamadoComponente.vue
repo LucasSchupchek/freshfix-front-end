@@ -20,11 +20,11 @@
     </v-row>
     <v-row>
       <v-col cols="12">
-        <v-dialog v-model="dialog" max-width="750" persistent>
+        <v-dialog v-model="dialogNovoChamado" max-width="750" persistent>
           <template v-slot:activator="{ props: activatorProps }">
             <v-btn class="novo-chamado-button" color="primary" v-bind="activatorProps">Novo Chamado</v-btn>
           </template>
-          <NovoChamado :dialog="dialog" @fechar-dialog="fecharDialog"/>
+          <NovoChamado :dialog="dialogNovoChamado" @fechar-dialog="fecharDialogNovoChamado"/>
         </v-dialog>
       </v-col>
     </v-row>
@@ -42,26 +42,26 @@
           class="elevation-0 no-borders"
         >
           <template v-slot:[`item.status`]="{ item }">
-            <v-chip :color="getStatusColor(item.status)" dark>{{ item.status }}</v-chip>
+          <v-chip :color="getStatusColor(item.status)" dark>{{ item.status }}</v-chip>
           </template>
           <template v-slot:[`item.action`]="{ item }">
-              <v-icon @click="openEditDialog(item)" color="primary">mdi-pencil</v-icon>
-            </template>
+            <v-icon @click="openEditDialog(item)" color="primary">mdi-pencil</v-icon>
+          </template>
         </v-data-table>
-        <v-dialog v-model="isEditDialogOpen" max-width="600" persistent>
-          <Chamado :dialog="isEditDialogOpen" :Chamado="selectedchamado"/>
+        <v-dialog v-model="dialogEditChamado" max-width="1200">
+          <Chamado :dialog="dialogEditChamado" :chamado="selectedChamado" @atualizar-chamados="recarregarChamados" />
         </v-dialog>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
-
 <script>
 import NovoChamado from './NovoChamado.vue';
 import Chamado from './Chamado.vue';
 import http from '@/services/http.js';
 import { useAuth } from '@/stores/auth.js';
+
 const auth = useAuth();
 const bearer = `Bearer ${auth.token}`;
 
@@ -82,7 +82,8 @@ export default {
   },
   data() {
     return {
-      dialog: false,
+      dialogNovoChamado: false,
+      dialogEditChamado: false,
       search: '',
       headers: [
         { title: 'ID', key: 'id' },
@@ -95,7 +96,8 @@ export default {
         { title: 'Ação', key: 'action' }
       ],
       orders: [],
-      dashOrders: []
+      dashOrders: [],
+      selectedChamado: null,
     };
   },
   async created() {
@@ -103,40 +105,31 @@ export default {
     this.dashOrders = await this.loadDadosDashboard();
   },
   methods: {
-    fecharDialog() {
-      this.dialog = false;
+    fecharDialogNovoChamado() {
+      this.dialogNovoChamado = false;
       this.recarregarChamados();
     },
     async recarregarChamados() {
       this.orders = await this.loadChamados();
     },
     async openEditDialog(item) {
-    try {
-      // Realize a requisição para obter os dados completos do chamado
-      const response = await http.get(`/chamado/${item.id}`, {
-        headers: {
-          Authorization: bearer
-        }
-      });
+      try {
+        const response = await http.get(`/chamado/${item.id}`, {
+          headers: {
+            Authorization: bearer
+          }
+        });
 
-      // Verifique se a requisição foi bem-sucedida
-      if (response.data && response.data.result) {
-        // Se a requisição for bem-sucedida, abra o diálogo e passe os dados do chamado como parâmetro
-        if (this.$refs.chamadoCompleto) {
-          this.$refs.chamadoCompleto.carregarChamado(response.data.result);
+        if (response.data && response.data.result) {
+          this.selectedChamado = response.data.result;
+          this.dialogEditChamado = true;
         } else {
-          console.error('Erro: Componente Chamado não montado.');
+          console.error('Erro ao obter os dados do chamado:', response.data.error);
         }
-        this.dialog = true;
-      } else {
-        // Se a requisição falhar ou não retornar os dados esperados, exiba uma mensagem de erro
-        console.error('Erro ao obter os dados do chamado:', response.data.error);
+      } catch (error) {
+        console.error('Erro ao obter os dados do chamado:', error);
       }
-    } catch (error) {
-      // Se ocorrer um erro durante a requisição, exiba uma mensagem de erro
-      console.error('Erro ao obter os dados do chamado:', error);
-    }
-  },
+    },
     getStatusColor(status) {
       switch (status) {
         case 'Aguardando Feedback': return 'blue';
