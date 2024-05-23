@@ -25,7 +25,6 @@
       <v-row>
         <!-- Coluna da Esquerda (75%) -->
         <v-col cols="9">
-
           <v-card class="pa-4 mb-4" outlined>
             <v-row>
               <v-col cols="12">
@@ -53,12 +52,11 @@
             <v-card-text class="anexos-container" style="overflow-x: auto;">
               <v-row class="anexos-row" no-gutters>
                 <v-col v-for="(anexo, index) in chamado.anexos" :key="index" cols="auto" class="anexo-col">
-                  <v-card outlined class="anexo-card">
-                    <v-img :src="anexo" contain></v-img>
-                    <v-card-actions>
-                      <a :href="anexo" target="_blank" class="anexo-link">Ver Anexo</a>
-                    </v-card-actions>
-                  </v-card>
+                  <a :href="anexo" target="_blank" class="anexo-link">
+                    <v-card outlined class="anexo-card">
+                      <v-img :src="isImage(anexo) ? anexo : defaultImage" contain></v-img>
+                    </v-card>
+                  </a>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -92,6 +90,13 @@
 </template>
 
 <script>
+import { useAuth } from '@/stores/auth';
+import http from '@/services/http.js';
+
+const auth = useAuth();
+const bearer = `Bearer ${auth.token}`;
+import defaultImage from '@/assets/anexo.png';
+
 export default {
   props: {
     chamado: Object,
@@ -100,6 +105,7 @@ export default {
     return {
       novoStatus: '',
       statusOptions: ['Em andamento', 'Pendente', 'Aguardando Feedback', 'Fechado'],
+      defaultImage, // Importa a imagem padrão
     };
   },
   methods: {
@@ -118,16 +124,48 @@ export default {
       this.$emit('fechar-dialog');
     },
     async atribuirChamado(id) {
-      // Lógica para atribuir o chamado
-    },
+    try {
+      await http.put(`/atribuirChamado/${id}`, {}, {
+        headers: {
+          Authorization: bearer
+        }
+      });
+      await this.carregarChamados();
+    } catch (error) {
+      console.error('Erro ao atribuir chamado:', error);
+    }
+  },
     async mudarStatus(id) {
-      // Lógica para mudar o status do chamado
+      try {
+        const response = await http.put(`/atualizaStatus/${id}`, {
+          status: this.novoStatus
+        }, {
+          headers: {
+            Authorization: bearer
+          }
+        });
+        // Verificar se a requisição foi bem-sucedida
+        if (response.data.error) {
+          console.error('Erro ao atualizar status:', response.data.error);
+          return;
+        }
+        // Se a atualização foi bem-sucedida, recarregar os chamados
+        await this.carregarChamados();
+      } catch (error) {
+        console.error('Erro ao atualizar status:', error);
+      }
     },
     grant() {
-      // Lógica para verificar permissões
+      const arrayGrants = ['admin', 'supervisor', 'analista', 'tecnico'];
+      return arrayGrants.includes(auth.permission);
     },
     isCurrentUser(responsavel) {
       // Lógica para verificar se o usuário atual é o responsável pelo chamado
+    },
+    isImage(file) {
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+      const extension = file.split('.').pop().toLowerCase();
+      return imageExtensions.includes(extension);
     }
   }
 };
