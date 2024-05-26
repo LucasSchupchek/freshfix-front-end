@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import ListChamados from '../components/ListChamados.vue';
+import ListChamados from '../components/chamados/ListChamados.vue';
 import { ref } from 'vue';
 import http from '@/services/http.js';
 import { useAuth } from '@/stores/auth.js';

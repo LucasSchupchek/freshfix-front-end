@@ -9,8 +9,8 @@
 <script setup>
 import { useAuth } from '@/stores/auth.js'
 
-import Sidebar from './components/Sidebar.vue';
-import Header from './components/Header.vue';
+import Sidebar from './components/app/Sidebar.vue';
+import Header from './components/app/Header.vue';
 const auth = useAuth();
 
 </script>

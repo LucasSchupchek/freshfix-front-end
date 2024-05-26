@@ -28,7 +28,7 @@ const router = createRouter({
     {
       path: '/meusChamados',
       name: 'meusChamados',
-      component: () => import('../views/MeusChamados.vue'),
+      component: () => import('../views/Chamados.vue'),
       meta: {
         auth: true
       }

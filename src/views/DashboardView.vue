@@ -35,10 +35,10 @@
 
 <script>
 import { ref } from 'vue';
-import BarChart from '../components/BarChart'
-import DoughnutChart from '../components/DoughnutChart'
-import HorizontalBarChart from '../components/HorizontalBarChart'
-import LogList from '../components/LogList'
+import BarChart from '../components/dashboard/BarChart'
+import DoughnutChart from '../components/dashboard/DoughnutChart'
+import HorizontalBarChart from '../components/dashboard/HorizontalBarChart'
+import LogList from '../components/dashboard/LogList'
 import { useAuth } from '@/stores/auth.js';
 
 const auth = useAuth();

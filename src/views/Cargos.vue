@@ -68,7 +68,7 @@
   import { ref, watch } from 'vue';
   import http from '@/services/http.js';
   import { useAuth } from '@/stores/auth.js';
-  import CadastroCargo from '../components/CadastroCargo.vue';
+  import CadastroCargo from '../components/cargos/CadastroCargo.vue';
   
   export default {
     components: {

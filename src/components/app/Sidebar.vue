@@ -2,7 +2,7 @@
   <v-navigation-drawer v-model="isDrawerOpen">
     <v-list>
       <v-list-item link to="dashboard" prepend-icon="mdi mdi-monitor-dashboard" title="Dashboard" v-show="permissao == 'admin' || permissao == 'supervisor'"></v-list-item>
-      <v-list-item link to="meusChamados" prepend-icon="mdi mdi-file-account" title="Meus Chamados"></v-list-item>
+      <v-list-item link to="meusChamados" prepend-icon="mdi mdi-file-account" title="Meus Chamados" v-show="permissao == 'default'"></v-list-item>
       <v-list-item link to="chamadosTecnicos" prepend-icon="mdi mdi-order-bool-descending-variant" v-show="permissao !== 'default'" title="Chamados"></v-list-item>
 
       <v-list-group value="Configuracoes">
@@ -30,7 +30,6 @@
 <script>
 import { isDrawerOpen } from '@/stores/stores';
 import { computed } from 'vue';
-import NovoChamado from './NovoChamado.vue'
 
 export default {
   name: "Sidebar",
@@ -41,9 +40,6 @@ export default {
     return {
       dialog: false,
     };
-  },
-  components: {
-    NovoChamado,
   },
   setup(props) {
     const permissao = computed(() => props.permission);

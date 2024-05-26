@@ -71,7 +71,7 @@
 import { ref, watch } from 'vue';
 import http from '@/services/http.js';
 import { useAuth } from '@/stores/auth.js';
-import CadastroCategoria from '../components/CadastroCategoria';
+import CadastroCategoria from '../components/categorias/CadastroCategoria';
 
 
 export default {

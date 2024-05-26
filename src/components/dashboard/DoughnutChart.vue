@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="dataLoaded">
-      <Doughnut :data="data" :options="options" />
+      <Doughnut :data="chartData" :options="chartOptions" />
     </div>
     <div v-else>
       <p>Carregando...</p>
@@ -18,7 +18,7 @@ import { useAuth } from '@/stores/auth.js';
 
 const auth = useAuth();
 const bearer = `Bearer ${auth.token}`;
-  
+
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 export default {
@@ -26,16 +26,16 @@ export default {
   components: { Doughnut },
   data() {
     return {
-      data: {
+      chartData: {
         labels: [],
         datasets: [
           {
-            backgroundColor: ['#41B883', '#DD1B16'],
+            backgroundColor: ['#007bff', '#fd7e14', '#28a745'], // Azul, Laranja e Verde
             data: []
           }
         ]
       },
-      options: {
+      chartOptions: {
         responsive: true,
         maintainAspectRatio: false
       },
@@ -54,15 +54,17 @@ export default {
           }
         });
 
-        if(resp.data.error) {
+        if (resp.data.error) {
           console.log('Erro ao buscar dados', + resp.data.error);
           return;
         }
 
         const dados = resp.data.result;
+
+        // Processando o objeto retornado pela API
+        this.chartData.labels = Object.keys(dados);
+        this.chartData.datasets[0].data = Object.values(dados);
         
-        this.data.labels = dados.map(el => el.status);
-        this.data.datasets[0].data = dados.map(el => el.total);
         this.dataLoaded = true; // Definir como true após os dados serem carregados
       } catch (error) {
         console.error('Erro ao atualizar status:', error);

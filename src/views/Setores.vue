@@ -68,7 +68,7 @@
 import { ref, watch } from 'vue';
 import http from '@/services/http.js';
 import { useAuth } from '@/stores/auth.js';
-import CadastroSetor from '../components/CadastroSetor.vue';
+import CadastroSetor from '../components/setores/CadastroSetor.vue';
 
 export default {
   components: {

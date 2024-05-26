@@ -2,11 +2,11 @@
   <v-card class="dialog-card">
     <v-card-title>
       <div class="action-container">
-        <div id="titulo" class="titulo-container">
+        <div id="titulo" class="titulo-container ma-2">
           <h1 class="headline">{{ chamado.titulo }}</h1>
         </div>
         <div v-if="!chamado.id_responsavel && grant()">
-          <v-btn color="primary" @click="atribuirChamado(chamado.id)">Atribuir</v-btn>
+          <v-btn color="primary" class="ma-2" @click="atribuirChamado(chamado.id)">Atribuir</v-btn>
         </div>
         <div v-else-if="chamado.id_responsavel && isCurrentUser(chamado.id_responsavel)">
           <v-select
@@ -16,7 +16,7 @@
             variant="solo-filled"
             v-model="novoStatus"
             @update:modelValue="mudarStatus(chamado.id)"
-            class="status-select"
+            class="status-select ma-2"
           ></v-select>
         </div>
       </div>
@@ -37,7 +37,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="4"><strong>Status:</strong> {{ chamado.status_chamado }}</v-col>
+              <v-col cols="4"><strong>Status:</strong> {{ chamado.status }}</v-col>
               <v-col cols="4"><strong>Categoria:</strong> {{ chamado.descricao_categoria }}</v-col>
               <v-col cols="4"><strong>Data de Cadastro:</strong> {{ chamado.data_cadastro }}</v-col>
             </v-row>
@@ -62,9 +62,8 @@
             </v-card-text>
           </v-card>
 
-          <v-card class="pa-4 .mb-4" outlined>
-            <Chat :chamado_id="chamado.id"/>
-          </v-card>
+            <v-card-title class="headline">Chat</v-card-title>
+            <Chat class="pa-4 mb-4" style="margin-bottom: 16px;" :chamado_id="chamado.id" />
         </v-col>
         <!-- Coluna da Direita (25%) -->
         <v-col cols="3">
@@ -124,35 +123,31 @@ export default {
       this.$emit('fechar-dialog');
     },
     async atribuirChamado(id) {
-    try {
-      await http.put(`/atribuirChamado/${id}`, {}, {
-        headers: {
-          Authorization: bearer
-        }
-      });
-      await this.carregarChamados();
-    } catch (error) {
-      console.error('Erro ao atribuir chamado:', error);
-    }
-  },
+      try {
+        await http.put(`/atribuirChamado/${id}`, {}, {
+          headers: {
+            Authorization: bearer
+          }
+        });
+        this.chamado.id_responsavel = auth.user.id;; // Atualiza o responsável no frontend
+        this.$emit('fechar-dialog');
+      } catch (error) {
+        console.error('Erro ao atribuir chamado:', error);
+      }
+    },
     async mudarStatus(id) {
       try {
-        const response = await http.put(`/atualizaStatus/${id}`, {
+        await http.put(`/atualizaStatus/${id}`, {
           status: this.novoStatus
         }, {
           headers: {
             Authorization: bearer
           }
         });
-        // Verificar se a requisição foi bem-sucedida
-        if (response.data.error) {
-          console.error('Erro ao atualizar status:', response.data.error);
-          return;
-        }
-        // Se a atualização foi bem-sucedida, recarregar os chamados
-        await this.carregarChamados();
+        // Atualizar o status no chamado
+        this.chamado.status = this.novoStatus;
       } catch (error) {
-        console.error('Erro ao atualizar status:', error);
+        console.error('Erro ao mudar status do chamado:', error);
       }
     },
     grant() {
@@ -160,7 +155,7 @@ export default {
       return arrayGrants.includes(auth.permission);
     },
     isCurrentUser(responsavel) {
-      // Lógica para verificar se o usuário atual é o responsável pelo chamado
+      return responsavel === auth.user.id;
     },
     isImage(file) {
       const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];

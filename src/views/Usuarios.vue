@@ -68,8 +68,8 @@
 import { ref, watch } from 'vue';
 import http from '@/services/http.js';
 import { useAuth } from '@/stores/auth.js';
-import EditUserDialog from '@/components/EditUserDialog.vue';
-import NovoUsuario from '../components/NovoUsuario.vue'
+import EditUserDialog from '@/components/usuarios/EditUserDialog.vue';
+import NovoUsuario from '../components/usuarios/NovoUsuario.vue'
 
 export default {
   components: {

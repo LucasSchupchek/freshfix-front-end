@@ -137,7 +137,7 @@ import { useAuth } from '@/stores/auth';
 import http from '@/services/http.js';
 const auth = useAuth();
 const bearer = `Bearer ${auth.token}`;
-import Chat from './Chat.vue';
+import Chat from '../dashboard/Chat.vue';
 
 export default {
   name: "ListChamados",
