@@ -27,12 +27,9 @@
                   <v-list-item-icon>
                     <v-icon>mdi-account-outline</v-icon>
                   </v-list-item-icon>
-                  <v-dialog v-model="dialog" max-width="750" persistent>
-                    <v-list-item-content v-slot:activator="{ props: activatorProps }">
-                      <v-list-item-title v-bind="activatorProps">Meu perfil</v-list-item-title>
+                  <v-list-item-content>
+                      <v-list-item-title>Meu perfil</v-list-item-title>
                     </v-list-item-content>
-                    <Perfil :dialog="dialog" @fechar-dialog="fecharDialog"/>
-                  </v-dialog>
                 </v-btn>
               </v-list-item>
 
