@@ -18,7 +18,7 @@
               @click="triggerFileInput"
               style="cursor: pointer; position: relative;"
             >
-              <img :src="profileImage || profilePic" class="profile-image"/>
+              <img :src="profileImage || profilePic" class="profile-image" />
               <v-file-input
                 ref="fileInput"
                 v-model="profileImageFile"
@@ -29,7 +29,7 @@
             </v-avatar>
             <small class="profile-description">Adicionar imagem de perfil</small>
           </v-col>
-          <v-col cols="12">
+          <v-col cols="6">
             <v-text-field
               v-model="nome"
               label="Nome"
@@ -37,7 +37,7 @@
               required
             ></v-text-field>
           </v-col>
-          <v-col cols="12">
+          <v-col cols="6">
             <v-text-field
               v-model="sobrenome"
               label="Sobrenome"
@@ -45,7 +45,7 @@
               required
             ></v-text-field>
           </v-col>
-          <v-col cols="12">
+          <v-col cols="6">
             <v-text-field
               v-model="email"
               label="Email"
@@ -54,7 +54,16 @@
               required
             ></v-text-field>
           </v-col>
-          <v-col cols="12">
+          <v-col cols="6">
+            <v-text-field
+              v-model="username"
+              label="Username"
+              type="text"
+              :rules="[rules.required]"
+              required
+            ></v-text-field>
+          </v-col>
+          <v-col cols="6">
             <v-text-field
               v-model="password"
               label="Senha"
@@ -63,7 +72,16 @@
               required
             ></v-text-field>
           </v-col>
-          <v-col cols="12">
+          <v-col cols="6">
+            <v-text-field
+              v-model="confirmPassword"
+              label="Confirmar Senha"
+              type="password"
+              :rules="[rules.required, rules.passwordMatch]"
+              required
+            ></v-text-field>
+          </v-col>
+          <v-col cols="4">
             <v-autocomplete
               v-model="selectedSetor"
               label="Setor"
@@ -76,7 +94,7 @@
               required
             ></v-autocomplete>
           </v-col>
-          <v-col cols="12">
+          <v-col cols="4">
             <v-autocomplete
               v-model="selectedCargo"
               :items="cargos"
@@ -89,7 +107,7 @@
               required
             ></v-autocomplete>
           </v-col>
-          <v-col cols="12">
+          <v-col cols="4">
             <v-select
               v-model="selectedNivelAcesso"
               :items="accessLevels"
@@ -130,7 +148,9 @@ export default {
     const nome = ref('');
     const sobrenome = ref('');
     const email = ref('');
+    const username = ref('');
     const password = ref('');
+    const confirmPassword = ref('');
     const selectedSetor = ref(null);
     const selectedCargo = ref(null);
     const selectedNivelAcesso = ref(null);
@@ -149,7 +169,8 @@ export default {
       email: value => {
         const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return pattern.test(value) || 'E-mail inválido';
-      }
+      },
+      passwordMatch: value => value === password.value || 'As senhas não coincidem'
     };
 
     onMounted(async () => {
@@ -196,6 +217,7 @@ export default {
         formData.append('nome', nome.value);
         formData.append('sobrenome', sobrenome.value);
         formData.append('email', email.value);
+        formData.append('username', username.value);
         formData.append('password', password.value);
         formData.append('setor', selectedSetor.value);
         formData.append('cargo', selectedCargo.value);
@@ -214,7 +236,16 @@ export default {
         fecharDialog();
       } catch (error) {
         console.error('Erro ao cadastrar usuário:', error);
-        alertMessage.value = `Erro ao cadastrar usuário: ${error.response?.data?.error || error.message}`;
+        
+        if (error.response && error.response.data && error.response.data.error) {
+          if (error.response.data.error === 'Email ou username já cadastrado') {
+            alertMessage.value = 'Email ou username já cadastrado';
+          } else {
+            alertMessage.value = `Erro ao cadastrar usuário: ${error.response.data.error}`;
+          }
+        } else {
+          alertMessage.value = 'Erro interno ao cadastrar usuário';
+        }
       } finally {
         loading.value = false;
       }
@@ -239,7 +270,9 @@ export default {
       nome,
       sobrenome,
       email,
+      username,
       password,
+      confirmPassword,
       selectedSetor,
       selectedCargo,
       selectedNivelAcesso,

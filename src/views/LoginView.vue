@@ -55,6 +55,7 @@ async function login() {
 
     auth.setToken(data.data.result.token);
     auth.setUser(data.data.result.user);
+    auth.setProfilePath(data.data.result.ProfilePath);
 
     if (auth.permission === 'admin') {
       router.push({ name: 'dashboard' });

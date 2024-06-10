@@ -1,44 +1,47 @@
 <template>
   <v-main>
     <v-container>
-      <h1>Dashboard</h1>
-      <v-row no-gutters class="dashboard_shadow">
-        <v-col cols="6">
-          <v-card class="chart-container">
-            <v-chip-group v-model="selectedFilter" class="mb-4">
-              <v-chip v-for="filter in filters" :key="filter" :value="filter">{{ filter }}</v-chip>
-            </v-chip-group>
-            <BarChart :filter="selectedFilter"/>
-          </v-card>
-        </v-col>
+      <v-container class="custom-container" max-width="800px">
+        <h1>Dashboard</h1>
+        <v-row justify="center" align="stretch">
+          <v-col cols="12" md="9">
+            <v-card class="chart-container mb-4">
+              <v-chip-group v-model="selectedFilter" class="mb-4">
+                <v-chip v-for="filter in filters" :key="filter" :value="filter">{{ filter }}</v-chip>
+              </v-chip-group>
+              <BarChart :filter="selectedFilter" />
+            </v-card>
+          </v-col>
 
-        <v-col cols="6">
-          <v-card class="chart-container">
-            <div class="card-content">
-              <DoughnutChart />
-            </div>
-          </v-card>
-        </v-col>
-      </v-row>
+          <v-col cols="12" md="3">
+            <v-card class="chart-container">
+              <div class="card-content">
+                <DoughnutChart />
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
 
-      <h1>Equipe</h1>
-      <v-row no-gutters class="dashboard_shadow">
-        <HorizontalBarChart />
-      </v-row>
-      <h1>Logs do sistema</h1>
-      <v-row no-gutters class="dashboard_shadow">
-        <LogList :logs="logs" />
-      </v-row>
+        <h1>Equipe</h1>
+        <v-row class="dashboard_shadow">
+          <HorizontalBarChart />
+        </v-row>
+
+        <h1>Logs do sistema</h1>
+        <v-row class="dashboard_shadow">
+          <LogList :logs="logs" />
+        </v-row>
+      </v-container>
     </v-container>
   </v-main>
 </template>
 
 <script>
 import { ref } from 'vue';
-import BarChart from '../components/dashboard/BarChart'
-import DoughnutChart from '../components/dashboard/DoughnutChart'
-import HorizontalBarChart from '../components/dashboard/HorizontalBarChart'
-import LogList from '../components/dashboard/LogList'
+import BarChart from '../components/dashboard/BarChart';
+import DoughnutChart from '../components/dashboard/DoughnutChart';
+import HorizontalBarChart from '../components/dashboard/HorizontalBarChart';
+import LogList from '../components/dashboard/LogList';
 import { useAuth } from '@/stores/auth.js';
 
 const auth = useAuth();
@@ -52,26 +55,26 @@ export default {
     LogList
   },
   setup() {
-    const selectedFilter = ref('Categorias')
-    const filters = ref(['Categorias', 'Setor'])
-    const logs = ref([])
+    const selectedFilter = ref('Categorias');
+    const filters = ref(['Categorias', 'Setor']);
+    const logs = ref([]);
 
     const addLog = (user, action) => {
       logs.value.push({
         user,
         action,
         timestamp: new Date().toLocaleString()
-      })
-    }
+      });
+    };
 
     return {
       selectedFilter,
       filters,
       logs,
       addLog
-    }
+    };
   }
-}
+};
 </script>
 
 <style scoped>

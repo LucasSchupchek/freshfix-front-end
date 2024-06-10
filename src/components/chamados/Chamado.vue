@@ -5,19 +5,21 @@
         <div id="titulo" class="titulo-container ma-2">
           <h1 class="headline">{{ chamado.titulo }}</h1>
         </div>
-        <div v-if="!chamado.id_responsavel && grant()">
-          <v-btn color="primary" class="ma-2" @click="atribuirChamado(chamado.id)">Atribuir</v-btn>
-        </div>
-        <div v-else-if="chamado.id_responsavel && isCurrentUser(chamado.id_responsavel)">
-          <v-select
-            :items="statusOptions"
-            density="compact"
-            label="Mudar Status"
-            variant="solo-filled"
-            v-model="novoStatus"
-            @update:modelValue="mudarStatus(chamado.id)"
-            class="status-select ma-2"
-          ></v-select>
+        <div v-if="chamado.status != 'Fechado'">
+          <div v-if="!chamado.id_responsavel && grant()">
+            <v-btn color="primary" class="ma-2" @click="atribuirChamado(chamado.id)">Atribuir</v-btn>
+          </div>
+          <div v-else-if="chamado.id_responsavel && isCurrentUser(chamado.id_responsavel)">
+            <v-select
+              :items="statusOptions"
+              density="compact"
+              label="Mudar Status"
+              variant="solo-filled"
+              v-model="novoStatus"
+              @update:modelValue="mudarStatus(chamado.id)"
+              class="status-select ma-2"
+            ></v-select>
+          </div>
         </div>
       </div>
     </v-card-title>
@@ -70,7 +72,7 @@
           <v-card class="pa-4 mb-4" outlined>
             <v-card-title class="headline">Usuário</v-card-title>
             <v-card-text>
-              <div><strong>Nome:</strong> {{ chamado.nome_usuario }} {{ chamado.sobrenome_usuario }}</div>
+              <div><strong>Nome:</strong> {{ chamado.usuario }}</div>
               <div><strong>Email:</strong> {{ chamado.email_usuario }}</div>
               <div><strong>Setor:</strong> {{ chamado.setor_usuario }}</div>
             </v-card-text>
@@ -78,7 +80,7 @@
           <v-card class="pa-4 .mb-4" outlined>
             <v-card-title class="headline">Técnico</v-card-title>
             <v-card-text>
-              <div><strong>Nome:</strong> {{ chamado.nome_responsavel }} {{ chamado.sobrenome_responsavel }}</div>
+              <div><strong>Nome:</strong> {{ chamado.responsavel }}</div>
               <div><strong>Email:</strong> {{ chamado.email_responsavel }}</div>
             </v-card-text>
           </v-card>
@@ -103,7 +105,7 @@ export default {
   data() {
     return {
       novoStatus: '',
-      statusOptions: ['Em andamento', 'Pendente', 'Aguardando Feedback', 'Fechado'],
+      statusOptions: ['Em andamento', 'Pendente', 'Fechado'],
       defaultImage, // Importa a imagem padrão
     };
   },
@@ -136,6 +138,7 @@ export default {
       }
     },
     async mudarStatus(id) {
+      console.log(this.novoStatus)
       try {
         await http.put(`/atualizaStatus/${id}`, {
           status: this.novoStatus
@@ -146,6 +149,7 @@ export default {
         });
         // Atualizar o status no chamado
         this.chamado.status = this.novoStatus;
+        this.$emit('atualizar-chamados');
       } catch (error) {
         console.error('Erro ao mudar status do chamado:', error);
       }

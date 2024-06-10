@@ -1,9 +1,18 @@
 <template>
   <v-card prepend-icon="mdi-account" title="Novo Chamado">
+    <v-alert v-if="alertMessage" type="error" dense dismissible>
+      {{ alertMessage }}
+      <template v-slot:close>
+        <v-btn icon @click="alertMessage = ''">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+    </v-alert>
+
     <v-card-text>
       <v-row dense>
         <v-col cols="12">
-          <v-text-field v-model="titulo" label="Titulo do chamado" required></v-text-field>
+          <v-text-field v-model="titulo" label="Titulo do chamado" required :counter="50"></v-text-field>
         </v-col>
 
         <v-col cols="12">
@@ -18,7 +27,7 @@
         </v-col>
 
         <v-col cols="12">
-          <v-textarea v-model="descricao" label="Descrição"></v-textarea>
+          <v-textarea v-model="descricao" label="Descrição" required></v-textarea>
         </v-col>
 
         <v-col cols="12">
@@ -36,7 +45,6 @@
             </template>
           </v-file-input>
         </v-col>
-
       </v-row>
     </v-card-text>
 
@@ -44,8 +52,8 @@
 
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn text @click="fecharDialog()">Close</v-btn>
-      <v-btn color="primary" @click="salvar">Save</v-btn>
+      <v-btn text @click="fecharDialog">Cancelar</v-btn>
+      <v-btn color="primary" @click="salvar">Salvar</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -69,23 +77,28 @@ export default {
     const files = ref([]);
     const titulo = ref(''); // Definindo a variável titulo
     const descricao = ref(''); // Definindo a variável descricao
+    const alertMessage = ref(''); // Variável para armazenar a mensagem de erro
+
+    // Função para exibir a mensagem de erro na tela
+    const mostrarErro = mensagem => {
+      alertMessage.value = mensagem;
+    };
 
     const listarCategorias = async () => {
-    try {
-      const response = await http.get('/categorias', {
-        headers: {
-          Authorization: bearer
-        }
-      });
-      categoriaOptions.value = response.data.result.data.map(categoria => ({
-        id: categoria.id,
-        descricao: categoria.descricao
-      }));
-      console.log(categoriaOptions)
-    } catch(error) {
-      console.log(error.response.data);
-    }
-  };
+      try {
+        const response = await http.get('/categorias', {
+          headers: {
+            Authorization: bearer
+          }
+        });
+        categoriaOptions.value = response.data.result.data.map(categoria => ({
+          id: categoria.id,
+          descricao: categoria.descricao
+        }));
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
 
     const fecharDialog = () => {
       emit('fechar-dialog');
@@ -93,6 +106,17 @@ export default {
 
     const salvar = async () => {
       try {
+        // Validação do título, da descrição e da categoria
+        if (!titulo.value.trim() || !descricao.value.trim() || !selectedCategoria.value) {
+          mostrarErro('O título, a descrição e a categoria são campos obrigatórios.');
+          return;
+        }
+
+        if (titulo.value.length > 50) {
+          mostrarErro('O título deve ter no máximo 50 caracteres.');
+          return;
+        }
+
         const formData = new FormData();
         formData.append('titulo', titulo.value);
         formData.append('descricao', descricao.value);
@@ -103,25 +127,26 @@ export default {
           formData.append('files', file);
         }
 
-        const teste = http.post('/chamado', formData, {
+        await http.post('/chamado', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: bearer,
           },
         });
 
-        console.log(teste)
         // Limpa os campos após o envio bem-sucedido
         titulo.value = '';
         descricao.value = '';
         selectedCategoria.value = null;
         files.value = [];
 
-        // Fecha o diálogo após salvar
-        fecharDialog();
+        // Fecha o diálogo após salvar e emite o evento para recarregar os chamados
+        emit('fechar-dialog');
       } catch (error) {
         console.error('Erro ao salvar o chamado:', error);
-        // Manipule o erro conforme necessário
+
+        // Exibe a mensagem de erro no alert
+        mostrarErro(error.response?.data?.message || 'Ocorreu um erro ao salvar o chamado.');
       }
     };
 
@@ -129,7 +154,7 @@ export default {
       listarCategorias();
     });
 
-    return { categoriaOptions, selectedCategoria, files, fecharDialog, salvar, titulo, descricao };
+    return { categoriaOptions, selectedCategoria, files, fecharDialog, salvar, titulo, descricao, alertMessage };
   },
 };
 </script>

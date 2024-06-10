@@ -78,7 +78,7 @@
     </v-row>
 
     <!-- Botão de criar novo chamado -->
-    <v-row v-show="permission == 'default'">
+    <v-row v-if="permission == 'default'">
       <v-col cols="12">
         <v-dialog v-model="dialogNovoChamado" max-width="750" persistent>
           <template v-slot:activator="{ props: activatorProps }">
@@ -298,30 +298,10 @@ export default {
 </script>
 
 <style scoped>
-.custom-container {
-  border-radius: 13px;
-  padding: 16px;
-  background-color: #ffffff;
-}
+
 
 .ma-2 {
   margin: 8px !important;
 }
 
-.v-data-table {
-  margin-top: 16px;
-}
-
-.no-borders .v-data-table-header th,
-.no-borders .v-data-table tbody tr {
-  border: none !important;
-}
-
-.no-borders .v-data-table-header {
-  border-bottom: none !important;
-}
-
-.no-borders .v-data-table-header th {
-  border-bottom: none !important;
-}
 </style>

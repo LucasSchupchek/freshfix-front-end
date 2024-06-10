@@ -1,65 +1,70 @@
 <template>
   <v-main>
-    <v-container fluid class="user-list-container">
-      <v-row justify="center">
-        <v-col cols="12">
-          <h2>Usuários</h2>
-          <div class="text-right">
-            <v-dialog v-model="dialog" max-width="750" persistent>
-              <template v-slot:activator="{ props: activatorProps }">
-                <v-btn color="primary" v-bind="activatorProps">Cadastrar Usuário</v-btn>
+    <v-container>
+      <v-container class="custom-container" max-width="600px">
+        <v-row justify="center">
+          <v-col cols="12">
+            <h2>Usuários</h2>
+            <div class="text-right">
+              <v-dialog v-model="dialog" max-width="600" persistent>
+                <template v-slot:activator="{ props: activatorProps }">
+                  <v-btn color="primary" v-bind="activatorProps">Cadastrar user</v-btn>
+                </template>
+                <NovoUsuario :dialog="dialog" @fechar-dialog="fecharDialog"/>
+              </v-dialog>
+            </div>
+          </v-col>
+          <v-col cols="12">
+            <v-data-table
+              v-model:items-per-page="itemsPerPage"
+              :headers="headers"
+              :items="serverItems"
+              :items-length="totalItems"
+              :loading="loading"
+              :search="search.descricao"
+              item-value="descricao"
+              @update:options="loadItems"
+            >
+              <template v-slot:top>
+                <v-text-field
+                  v-model="search.descricao"
+                  density="compact"
+                  placeholder="Pesquisar..."
+                  hide-details
+                ></v-text-field>
               </template>
-              <NovoUsuario :dialog="dialog" @fechar-dialog="fecharDialog"/>
-            </v-dialog>
-          </div>
-        </v-col>
-        <v-col cols="12">
-          <v-data-table
-            v-model:items-per-page="itemsPerPage"
-            :headers="headers"
-            :items="serverItems"
-            :items-length="totalItems"
-            :loading="loading"
-            :search="search"
-            item-value="nome"
-            @update:options="loadItems"
-          >
-            <template v-slot:top>
-              <v-text-field
-                v-model="search.nome"
-                density="compact"
-                placeholder="Search name..."
-                hide-details
-              ></v-text-field>
-            </template>
-            <template v-slot:[`item.ativo`]="{ item }">
-              <v-icon
-                :color="item.hoverIcon ? (item.ativo ? 'red' : 'green') : (item.ativo ? 'green' : 'red')"
-                @click="confirmToggleUserStatus(item)"
-                @mouseover="setHoverIcon(item)"
-                @mouseleave="resetIcon(item)"
-              >{{ item.hoverIcon || (item.ativo ? 'mdi-check' : 'mdi-close') }}</v-icon>
-            </template>
-            <template v-slot:[`item.actions`]="{ item }">
-              <v-icon @click="openEditDialog(item)" color="primary">mdi-pencil</v-icon>
-            </template>
-          </v-data-table>
-        </v-col>
-      </v-row>
-      <v-dialog v-model="isEditDialogOpen" max-width="750" persistent>
-        <EditUserDialog :user="selectedUser" :isOpen="isEditDialogOpen" :accessLevels="accessLevels" @fechar-dialog="fecharEditDialog"></EditUserDialog>
-      </v-dialog>
-      <v-dialog v-model="isToggleDialogOpen" max-width="500px">
-        <v-card>
-          <v-card-title class="headline">Confirmação</v-card-title>
-          <v-card-text>Você tem certeza que deseja {{ selectedUser?.ativo ? 'inativar' : 'ativar' }} o usuário {{ selectedUser?.nome }}?</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="isToggleDialogOpen = false">Cancelar</v-btn>
-            <v-btn color="green darken-1" text @click="toggleUserStatus">Confirmar</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+              <template v-slot:[`item.ativo`]="{ item }">
+                <v-icon
+                  :color="item.hoverIcon ? (item.ativo ? 'red' : 'green') : (item.ativo ? 'green' : 'red')"
+                  @click="confirmToggleUserStatus(item)"
+                  @mouseover="setHoverIcon(item)"
+                  @mouseleave="resetIcon(item)"
+                >{{ item.hoverIcon || (item.ativo ? 'mdi-check' : 'mdi-close') }}</v-icon>
+              </template>
+              <template v-slot:[`item.color`]="{ item }">
+                <v-chip v-bind:style="{ backgroundColor: item.color }"></v-chip>
+              </template>
+              <template v-slot:[`item.actions`]="{ item }">
+                <v-icon @click="openEditDialog(item)" color="primary">mdi-pencil</v-icon>
+              </template>
+            </v-data-table>
+          </v-col>
+        </v-row>
+        <v-dialog v-model="isEditDialogOpen" max-width="600" persistent>
+          <EditUserDialog :user="selectedUser" :isOpen="isEditDialogOpen" :accessLevels="accessLevels" @fechar-dialog="fecharEditDialog"></EditUserDialog>
+        </v-dialog>
+        <v-dialog v-model="isToggleDialogOpen" max-width="500px">
+          <v-card>
+            <v-card-title class="headline">Confirmação</v-card-title>
+            <v-card-text>Você tem certeza que deseja {{ selectedUser?.ativo ? 'inativar' : 'ativar' }} o user {{ selectedUser?.descricao }}?</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="isToggleDialogOpen = false">Cancelar</v-btn>
+              <v-btn color="green darken-1" text @click="toggleUserStatus">Confirmar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-container>
     </v-container>
   </v-main>
 </template>
@@ -68,15 +73,15 @@
 import { ref, watch } from 'vue';
 import http from '@/services/http.js';
 import { useAuth } from '@/stores/auth.js';
-import EditUserDialog from '@/components/usuarios/EditUserDialog.vue';
-import NovoUsuario from '../components/usuarios/NovoUsuario.vue'
+import NovoUsuario from '../components/usuarios/NovoUsuario';
+import EditUserDialog from '../components/usuarios/EditUserDialog';
 
 export default {
   components: {
-    EditUserDialog,
-    NovoUsuario
+    NovoUsuario,
+    EditUserDialog
   },
-  data(){
+  data() {
     return {
       dialog: false,
     };
@@ -87,28 +92,28 @@ export default {
     const serverItems = ref([]);
     const loading = ref(false);
     const totalItems = ref(0);
-    const search = ref({ nome: '' });
+    const search = ref({ descricao: '' });
     const itemsPerPage = ref(10);
     const headers = [
-      { title: 'Nome', align: 'start', key: 'nome' },
+      { title: 'ID', key: 'id', align: 'start' },
+      { title: 'Nome', key: 'nome', align: 'start' },
       { title: 'Sobrenome', key: 'sobrenome', align: 'start' },
       { title: 'Email', key: 'email', align: 'start' },
-      { title: 'Username', key: 'username', align: 'start' },
-      { title: 'Nível de Acesso', key: 'nivel_acesso', align: 'start' },
-      { title: 'Setor', key: 'setor', align: 'start' },
-      { title: 'Cargo', key: 'cargo', align: 'start' },
+      { title: 'Username', key: 'username', align: 'start', sortable: false },
+      { title: 'Nível de acesso', key: 'nivel_acesso', align: 'start', sortable: false },
+      { title: 'Setor', key: 'setor', align: 'start', sortable: false },
+      { title: 'Cargo', key: 'cargo', align: 'start', sortable: false },
       { title: 'Ativo', key: 'ativo', align: 'start' },
-      { title: 'Ações', key: 'actions', align: 'end' },
+      { title: 'Ações', key: 'actions', align: 'end' }
     ];
 
     const accessLevels = ref(['admin', 'supervisor', 'tecnico', 'default']);
+
     const isEditDialogOpen = ref(false);
-    const isDeleteDialogOpen = ref(false);
     const isToggleDialogOpen = ref(false);
     const selectedUser = ref(null);
 
     const fecharEditDialog = () => {
-      console.log('fechadasda dasdasodjaodasijd')
       isEditDialogOpen.value = false;
       loadItems({ page: 1, itemsPerPage: itemsPerPage.value });
     };
@@ -118,16 +123,15 @@ export default {
       try {
         const response = await http.get(`/users?page=${page}&limit=${itemsPerPage}`, {
           params: { sortBy, search: search.value },
-          headers: { Authorization: bearer           }
+          headers: { Authorization: bearer }
         });
         const { data } = response;
-        serverItems.value = data.result.data.map(user => ({
-          ...user,
-          ativo: user.ativo ? 1 : 0
-        }));
-        totalItems.value = data.result.totalItems;
+        serverItems.value = Array.isArray(data.result.data) ? data.result.data : [];
+        totalItems.value = data.result.totalItems || 0;
       } catch (error) {
-        console.error('Erro ao carregar usuários:', error);
+        console.error('Erro ao carregar users:', error);
+        serverItems.value = [];
+        totalItems.value = 0;
       } finally {
         loading.value = false;
       }
@@ -136,22 +140,6 @@ export default {
     const openEditDialog = (user) => {
       selectedUser.value = { ...user };
       isEditDialogOpen.value = true;
-    };
-
-    const confirmDeleteUser = (user) => {
-      selectedUser.value = user;
-      isDeleteDialogOpen.value = true;
-    };
-
-    const handleSave = async (user) => {
-      try {
-        await http.put(`/users/${user.id}`, user, {
-          headers: { Authorization: bearer }
-        });
-        loadItems({ page: 1, itemsPerPage: itemsPerPage.value });
-      } catch (error) {
-        console.error('Erro ao salvar usuário:', error);
-      }
     };
 
     const confirmToggleUserStatus = (user) => {
@@ -167,7 +155,7 @@ export default {
         });
         loadItems({ page: 1, itemsPerPage: itemsPerPage.value });
       } catch (error) {
-        console.error('Erro ao atualizar status do usuário:', error);
+        console.error('Erro ao atualizar status do user:', error);
       } finally {
         isToggleDialogOpen.value = false;
       }
@@ -188,31 +176,29 @@ export default {
     loadItems({ page: 1, itemsPerPage: itemsPerPage.value });
 
     return {
+      confirmToggleUserStatus,
+      toggleUserStatus,
+      setHoverIcon,
+      resetIcon,
       headers,
       search,
       serverItems,
       loading,
       totalItems,
       itemsPerPage,
-      accessLevels,
       isEditDialogOpen,
-      isDeleteDialogOpen,
       isToggleDialogOpen,
       selectedUser,
       openEditDialog,
-      confirmDeleteUser,
-      handleSave,
-      confirmToggleUserStatus,
-      toggleUserStatus,
-      setHoverIcon,
-      resetIcon,
-      fecharEditDialog
+      fecharEditDialog,
+      loadItems
     };
   },
   methods: {
+    
     fecharDialog() {
       this.dialog = false; // Fechar o diálogo
-      loadItems({ page: 1, itemsPerPage: itemsPerPage.value });
+      this.loadItems({ page: 1, itemsPerPage: this.itemsPerPage });
     },
   },
 };
@@ -220,11 +206,12 @@ export default {
 
 <style scoped>
 .user-list-container {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adicione o efeito de sombra */
-  margin: 10px auto; /* Margem 10px nas laterais e centralize horizontalmente */
-  max-width: 90%; /* Defina uma largura máxima */
-  display: flex; /* Use flexbox para centralizar verticalmente */
-  align-items: center; /* Centralize verticalmente */
-  justify-content: center; /* Centralize horizontalmente */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 10px auto;
+  max-width: 600px;
 }
+.data-table-container {
+  max-width: 600px;
+}
+
 </style>

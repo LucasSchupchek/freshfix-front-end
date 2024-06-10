@@ -31,7 +31,7 @@
           <v-text-field v-model="userCopy.username" label="Username"></v-text-field>
           <v-select v-model="userCopy.nivel_acesso" :items="accessLevels" label="Nível de Acesso"></v-select>
           <v-autocomplete
-            v-model="userCopy.setor"
+            v-model="selectedSetor"
             label="Setor"
             :items="setores"
             item-title="descricao"
@@ -40,7 +40,7 @@
             v-if="setores.length > 0"
           ></v-autocomplete>
           <v-autocomplete
-            v-model="userCopy.cargo"
+            v-model="selectedCargo"
             :items="cargos"
             item-title="descricao"
             item-value="id"
@@ -76,12 +76,15 @@ export default {
     const auth = useAuth();
     const bearer = `Bearer ${auth.token}`;
 
+    const accessLevels = ref(['admin', 'supervisor', 'tecnico', 'default']);
     const userCopy = ref({ ...props.user });
     const setores = ref([]);
     const cargos = ref([]);
     const loading = ref(false); // Adicionando a variável loading
     const profileImageFile = ref(null); // Adicionando o profileImageFile
     const profileImage = ref(null); // Adicionando o profileImage
+    const selectedCargo = ref(null);
+    const selectedSetor = ref(null);
 
     onMounted(async () => {
       await loadSetores();
@@ -115,9 +118,17 @@ export default {
     };
 
     const saveUser = async () => {
+      
+      console.log()
+
       try {
         const formData = new FormData();
-        
+        console.log(`SETOR ANTES: ${userCopy.value.setor} - SETOR AGORA: ${selectedSetor}`)
+        console.log(`CARGO ANTES: ${userCopy.value.cargo} - CARGO AGORA: ${selectedCargo}`)
+        console.log(userCopy.value)
+        userCopy.value.setor = selectedSetor.value;
+        userCopy.value.cargo = selectedCargo.value;
+
         // Adicione os dados do usuário ao formulário
         Object.keys(userCopy.value).forEach(key => {
           formData.append(key, userCopy.value[key]);
@@ -163,7 +174,7 @@ export default {
       userCopy.value = { ...newUser };
     });
 
-    return { userCopy, setores, cargos, saveUser, fecharDialog, loading, profilePic, profileImage, onImageChange, profileImageFile };
+    return { userCopy, accessLevels, setores, cargos, saveUser, fecharDialog, loading, profilePic, profileImage, onImageChange, profileImageFile, selectedSetor, selectedCargo };
   },
   methods: {
     async updateIsOpen(value) {

@@ -1,68 +1,70 @@
 <template>
   <v-main>
-    <v-container class="user-list-container" max-width="600px">
-      <v-row justify="center">
-        <v-col cols="12">
-          <h2>Categorias</h2>
-          <div class="text-right">
-            <v-dialog v-model="dialog" max-width="600" persistent>
-              <template v-slot:activator="{ props: activatorProps }">
-                <v-btn color="primary" v-bind="activatorProps">Cadastrar Categoria</v-btn>
+    <v-container>
+      <v-container class="custom-container" max-width="600px">
+        <v-row justify="center">
+          <v-col cols="12">
+            <h2>Categorias</h2>
+            <div class="text-right">
+              <v-dialog v-model="dialog" max-width="600" persistent>
+                <template v-slot:activator="{ props: activatorProps }">
+                  <v-btn color="primary" v-bind="activatorProps">Cadastrar Categoria</v-btn>
+                </template>
+                <CadastroCategoria :dialog="dialog" @fechar-dialog="fecharDialog"/>
+              </v-dialog>
+            </div>
+          </v-col>
+          <v-col cols="12">
+            <v-data-table
+              v-model:items-per-page="itemsPerPage"
+              :headers="headers"
+              :items="serverItems"
+              :items-length="totalItems"
+              :loading="loading"
+              :search="search.descricao"
+              item-value="descricao"
+              @update:options="loadItems"
+            >
+              <template v-slot:top>
+                <v-text-field
+                  v-model="search.descricao"
+                  density="compact"
+                  placeholder="Pesquisar..."
+                  hide-details
+                ></v-text-field>
               </template>
-              <CadastroCategoria :dialog="dialog" @fechar-dialog="fecharDialog"/>
-            </v-dialog>
-          </div>
-        </v-col>
-        <v-col cols="12">
-          <v-data-table
-            v-model:items-per-page="itemsPerPage"
-            :headers="headers"
-            :items="serverItems"
-            :items-length="totalItems"
-            :loading="loading"
-            :search="search.descricao"
-            item-value="descricao"
-            @update:options="loadItems"
-          >
-            <template v-slot:top>
-              <v-text-field
-                v-model="search.descricao"
-                density="compact"
-                placeholder="Pesquisar..."
-                hide-details
-              ></v-text-field>
-            </template>
-            <template v-slot:[`item.ativo`]="{ item }">
-              <v-icon
-                :color="item.hoverIcon ? (item.ativo ? 'red' : 'green') : (item.ativo ? 'green' : 'red')"
-                @click="confirmToggleUserStatus(item)"
-                @mouseover="setHoverIcon(item)"
-                @mouseleave="resetIcon(item)"
-              >{{ item.hoverIcon || (item.ativo ? 'mdi-check' : 'mdi-close') }}</v-icon>
-            </template>
-            <template v-slot:[`item.color`]="{ item }">
-              <v-chip v-bind:style="{ backgroundColor: item.color }"></v-chip>
-            </template>
-            <template v-slot:[`item.actions`]="{ item }">
-              <v-icon @click="openEditDialog(item)" color="primary">mdi-pencil</v-icon>
-            </template>
-          </v-data-table>
-        </v-col>
-      </v-row>
-      <v-dialog v-model="isEditDialogOpen" max-width="600" persistent>
-        <CadastroCategoria :dialog="isEditDialogOpen" :categoria="selectedcategoria" :isEdit="true" @fechar-dialog="fecharEditDialog" />
-      </v-dialog>
-      <v-dialog v-model="isToggleDialogOpen" max-width="500px">
-        <v-card>
-          <v-card-title class="headline">Confirmação</v-card-title>
-          <v-card-text>Você tem certeza que deseja {{ selectedcategoria?.ativo ? 'inativar' : 'ativar' }} o categoria {{ selectedcategoria?.descricao }}?</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="isToggleDialogOpen = false">Cancelar</v-btn>
-            <v-btn color="green darken-1" text @click="toggleUserStatus">Confirmar</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+              <template v-slot:[`item.ativo`]="{ item }">
+                <v-icon
+                  :color="item.hoverIcon ? (item.ativo ? 'red' : 'green') : (item.ativo ? 'green' : 'red')"
+                  @click="confirmToggleUserStatus(item)"
+                  @mouseover="setHoverIcon(item)"
+                  @mouseleave="resetIcon(item)"
+                >{{ item.hoverIcon || (item.ativo ? 'mdi-check' : 'mdi-close') }}</v-icon>
+              </template>
+              <template v-slot:[`item.color`]="{ item }">
+                <v-chip v-bind:style="{ backgroundColor: item.color }"></v-chip>
+              </template>
+              <template v-slot:[`item.actions`]="{ item }">
+                <v-icon @click="openEditDialog(item)" color="primary">mdi-pencil</v-icon>
+              </template>
+            </v-data-table>
+          </v-col>
+        </v-row>
+        <v-dialog v-model="isEditDialogOpen" max-width="600" persistent>
+          <CadastroCategoria :dialog="isEditDialogOpen" :categoria="selectedcategoria" :isEdit="true" @fechar-dialog="fecharEditDialog" />
+        </v-dialog>
+        <v-dialog v-model="isToggleDialogOpen" max-width="500px">
+          <v-card>
+            <v-card-title class="headline">Confirmação</v-card-title>
+            <v-card-text>Você tem certeza que deseja {{ selectedcategoria?.ativo ? 'inativar' : 'ativar' }} o categoria {{ selectedcategoria?.descricao }}?</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="isToggleDialogOpen = false">Cancelar</v-btn>
+              <v-btn color="green darken-1" text @click="toggleUserStatus">Confirmar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-container>
     </v-container>
   </v-main>
 </template>
@@ -72,7 +74,6 @@ import { ref, watch } from 'vue';
 import http from '@/services/http.js';
 import { useAuth } from '@/stores/auth.js';
 import CadastroCategoria from '../components/categorias/CadastroCategoria';
-
 
 export default {
   components: {
