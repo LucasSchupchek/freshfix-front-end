@@ -13,6 +13,9 @@ import Sidebar from './components/app/Sidebar.vue';
 import Header from './components/app/Header.vue';
 const auth = useAuth();
 
+// Defina o título da guia do navegador
+document.title = "FreshFix";
+
 </script>
 
 <style>
