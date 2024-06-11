@@ -44,6 +44,9 @@ To start the development server with hot-reload, run the following command. The 
 ```bash
 yarn dev
 ```
+```NPM
+npm run dev
+```
 
 (Repeat for npm, pnpm, and bun with respective commands.)
 
@@ -57,7 +60,7 @@ To build your project for production, use:
 yarn build
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+
 
 Once the build process is completed, your application will be ready for deployment in a production environment.
 
