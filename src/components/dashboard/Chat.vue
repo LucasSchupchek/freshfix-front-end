@@ -58,6 +58,7 @@ export default {
     },
     connectSocket() {
       setTimeout(() => {
+        // this.socket = io.connect('http://localhost:3000'); -- para rodar local, descomente essa linha e comente a linha abaixo.
         this.socket = io.connect('https://apichamados.onrender.com:443');
         this.socket.emit('set_username', this.userName);
 
