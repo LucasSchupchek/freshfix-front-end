@@ -1,7 +1,6 @@
 <template>
-  <v-card>
+  <v-card prepend-icon="mdi-account" title="Meu Perfil">
     <v-card-title>
-      Meu Perfil
       <v-spacer></v-spacer>
       <v-btn icon @click="$emit('close')">
         <v-icon>mdi-close</v-icon>
@@ -9,38 +8,75 @@
     </v-card-title>
     <v-divider></v-divider>
     <v-card-text v-if="user">
-      <v-col cols="12" class="d-flex flex-column align-center">
-        <v-avatar
-          size="120"
-          class="mb-2 profile-avatar"
-          @click="triggerFileInput"
-          style="cursor: pointer; position: relative;"
-        >
-          <img :src="profileImage || user.path_avatar || profilePic" class="profile-image"/>
-          <v-file-input
-            ref="fileInput"
-            v-model="profileImageFile"
-            accept="image/*"
-            @change="onImageChange"
-            style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;"
-          ></v-file-input>
-        </v-avatar>
-        <small class="profile-description">Adicionar imagem de perfil</small>
-      </v-col>
-      <v-form ref="form">
-        <v-text-field v-model="userCopy.nome" label="Nome" :readonly="loading"></v-text-field>
-        <v-text-field v-model="userCopy.sobrenome" label="Sobrenome" :readonly="loading"></v-text-field>
-        <v-text-field v-model="userCopy.email" label="Email" :readonly="loading"></v-text-field>
-        <v-text-field v-model="userCopy.username" label="Username" readonly></v-text-field>
-        <v-text-field v-model="userCopy.setor" label="Setor" readonly></v-text-field>
-        <v-text-field v-model="userCopy.cargo" label="Cargo" readonly></v-text-field>
+      <v-alert v-if="alertMessage" type="error" dense dismissible>
+        {{ alertMessage }}
+        <template v-slot:close>
+          <v-btn icon @click="alertMessage = ''">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </template>
+      </v-alert>
+      <v-form ref="profileForm" v-model="isFormValid">
+        <v-row dense justify="center">
+          <v-col cols="12" class="d-flex flex-column align-center">
+            <v-avatar
+              size="120"
+              class="mb-2 profile-avatar"
+              @click="triggerFileInput"
+              style="cursor: pointer; position: relative;"
+            >
+              <img :src="profileImage || user.path_avatar || profilePic" class="profile-image"/>
+              <v-file-input
+                ref="fileInput"
+                v-model="profileImageFile"
+                accept="image/*"
+                @change="onImageChange"
+                style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;"
+              ></v-file-input>
+            </v-avatar>
+            <small class="profile-description">Adicionar imagem de perfil</small>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field
+              v-model="userCopy.nome"
+              label="Nome"
+              :rules="nameRules"
+              :readonly="loading"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field
+              v-model="userCopy.sobrenome"
+              label="Sobrenome"
+              :rules="nameRules"
+              :readonly="loading"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field
+              v-model="userCopy.email"
+              label="Email"
+              :rules="emailRules"
+              :readonly="loading"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="userCopy.username" label="Username" readonly></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="userCopy.setor" label="Setor" readonly></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="userCopy.cargo" label="Cargo" readonly></v-text-field>
+          </v-col>
+        </v-row>
+        <v-btn color="blue darken-1" text @click="openChangePasswordDialog">Mudar Senha</v-btn>
       </v-form>
-      <v-btn color="blue darken-1" text @click="openChangePasswordDialog">Mudar Senha</v-btn>
     </v-card-text>
     <v-divider></v-divider>
-    <v-card-actions>
+    <v-card-actions class="justify-end">
       <v-btn color="blue darken-1" text @click="$emit('close')">Cancelar</v-btn>
-      <v-btn color="blue darken-1" text @click="saveProfile" :loading="loading">Salvar</v-btn>
+      <v-btn color="blue darken-1" text @click="saveProfile" :loading="loading" :disabled="!isFormValid">Salvar</v-btn>
     </v-card-actions>
 
     <!-- Dialog para mudar senha -->
@@ -54,7 +90,7 @@
             <v-text-field v-model="confirmPassword" label="Confirmar Nova Senha" type="password"></v-text-field>
           </v-form>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="justify-end">
           <v-btn color="blue darken-1" text @click="isChangePasswordDialogOpen = false">Cancelar</v-btn>
           <v-btn color="blue darken-1" text @click="changePassword" :loading="loading">Salvar</v-btn>
         </v-card-actions>
@@ -74,7 +110,7 @@ export default {
   props: {
     userId: Number
   },
-  emits: ['close', 'profile-updated'], // Adicionado 'profile-updated'
+  emits: ['close', 'profile-updated'],
   setup(props, { emit }) {
     const auth = useAuth();
     const bearer = `Bearer ${auth.token}`;
@@ -88,6 +124,16 @@ export default {
     const newPassword = ref('');
     const confirmPassword = ref('');
     const isChangePasswordDialogOpen = ref(false);
+    const alertMessage = ref('');
+    const isFormValid = ref(false);
+
+    const nameRules = [
+      v => !!v || 'Este campo é obrigatório',
+    ];
+    const emailRules = [
+      v => !!v || 'Email é obrigatório',
+      v => /.+@.+\..+/.test(v) || 'Email deve ser válido',
+    ];
 
     onMounted(async () => {
       await fetchUserData();
@@ -108,6 +154,8 @@ export default {
     };
 
     const saveProfile = async () => {
+      if (!isFormValid.value) return;
+
       try {
         loading.value = true;
 
@@ -132,7 +180,7 @@ export default {
 
         console.log('Perfil atualizado com sucesso:', response.data);
         await fetchUserData();
-        emit('profile-updated'); // Emitir um evento personalizado
+        emit('profile-updated');
         emit('close');
       } catch (error) {
         console.error('Erro ao atualizar perfil:', error);
@@ -143,7 +191,7 @@ export default {
 
     const changePassword = async () => {
       if (newPassword.value !== confirmPassword.value) {
-        alert('Nova senha e confirmação de senha não coincidem.');
+        alertMessage.value = 'Nova senha e confirmação de senha não coincidem.';
         return;
       }
 
@@ -200,6 +248,10 @@ export default {
       saveProfile,
       changePassword,
       isChangePasswordDialogOpen,
+      alertMessage,
+      isFormValid,
+      nameRules,
+      emailRules,
       openChangePasswordDialog: () => { isChangePasswordDialogOpen.value = true; },
       triggerFileInput: () => {
         const fileInput = this.$refs.fileInput;
@@ -214,19 +266,19 @@ export default {
 
 <style scoped>
 .profile-avatar {
-  transition: transform 0.3s;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 16px;
 }
-.profile-avatar:hover {
-  transform: scale(1.1);
-}
+
 .profile-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
+}
+
+.profile-description {
+  font-size: 12px;
+  color: #888;
 }
 </style>
