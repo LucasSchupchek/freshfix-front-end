@@ -2,9 +2,6 @@
   <v-card prepend-icon="mdi-account" title="Meu Perfil">
     <v-card-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="$emit('close')">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
     </v-card-title>
     <v-divider></v-divider>
     <v-card-text v-if="user">
@@ -70,13 +67,13 @@
             <v-text-field v-model="userCopy.cargo" label="Cargo" readonly></v-text-field>
           </v-col>
         </v-row>
-        <v-btn color="blue darken-1" text @click="openChangePasswordDialog">Mudar Senha</v-btn>
+        <v-btn color="primary" text @click="openChangePasswordDialog">Mudar Senha</v-btn>
       </v-form>
     </v-card-text>
     <v-divider></v-divider>
     <v-card-actions class="justify-end">
-      <v-btn color="blue darken-1" text @click="$emit('close')">Cancelar</v-btn>
-      <v-btn color="blue darken-1" text @click="saveProfile" :loading="loading" :disabled="!isFormValid">Salvar</v-btn>
+      <v-btn text @click="$emit('close')">Cancelar</v-btn>
+      <v-btn color="primary" text @click="saveProfile" :loading="loading" :disabled="!isFormValid">Salvar</v-btn>
     </v-card-actions>
 
     <!-- Dialog para mudar senha -->
@@ -91,8 +88,8 @@
           </v-form>
         </v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn color="blue darken-1" text @click="isChangePasswordDialogOpen = false">Cancelar</v-btn>
-          <v-btn color="blue darken-1" text @click="changePassword" :loading="loading">Salvar</v-btn>
+          <v-btn text @click="isChangePasswordDialogOpen = false">Cancelar</v-btn>
+          <v-btn color="primary" text @click="changePassword" :loading="loading">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
