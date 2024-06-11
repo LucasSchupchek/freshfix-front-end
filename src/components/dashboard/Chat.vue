@@ -58,7 +58,7 @@ export default {
     },
     connectSocket() {
       setTimeout(() => {
-        this.socket = io.connect('http://localhost:3000');
+        this.socket = io.connect('https://apichamados.onrender.com:443');
         this.socket.emit('set_username', this.userName);
 
         this.socket.on('receive_message', message => {

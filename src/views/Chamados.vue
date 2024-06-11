@@ -1,6 +1,6 @@
 <template>
   <v-main>
-    <v-container>
+    <v-container v-if="!isLoading">
       <v-container class="custom-container">
         <h2>Chamados</h2>
         <v-row>
@@ -115,6 +115,14 @@
 
       </v-container>      
     </v-container>
+    <div v-else class="loading-container">
+      <v-progress-circular
+        :size="100"
+        :width="10"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+    </div>
   </v-main>
 </template>
 
@@ -135,6 +143,8 @@ export default {
     const bearer = `Bearer ${auth.token}`;
     const permission = auth.permission;
     const userId = auth.user.id;
+
+    const isLoading = ref(true);
 
     const orders = ref([]);
     const dashOrders = ref([]);
@@ -163,6 +173,21 @@ export default {
     ]);
     const statusOptions = ref(['Aberto', 'Pendente', 'Em andamento', 'Fechado', 'Rejeitado']);
     const loading = ref(false);
+
+    const loadData = async () => {
+      try {
+        isLoading.value = true; // Marque isLoading como true antes de iniciar o carregamento dos dados
+
+        await loadChamados();
+        await loadCategorias();
+        await loadReponsaveis();
+        await loadDadosDashboard();
+
+        isLoading.value = false; // Após o carregamento completo dos dados, marque isLoading como false
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+      }
+    };
 
     const loadChamados = async () => {
       if (loading.value) return;
@@ -303,14 +328,10 @@ export default {
       await loadDadosDashboard();
     };
 
-    onMounted(async () => {
-      await loadChamados();
-      await loadCategorias();
-      await loadReponsaveis();
-      await loadDadosDashboard();
-    });
+    onMounted(loadData);
 
     return {
+      isLoading,
       dataInicial,
       dataFinal,
       search,
@@ -340,5 +361,10 @@ export default {
 </script>
 
 <style scoped>
-/* Adicione aqui seus estilos customizados */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Defina a altura para ocupar toda a altura da tela */
+}
 </style>

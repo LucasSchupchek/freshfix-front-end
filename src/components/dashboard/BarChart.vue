@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     fetchChartData() {
-      const url = this.filter === 'Categorias' ? 'http://localhost:3000/api/dashboard/chamadosCategoria' : 'http://localhost:3000/api/dashboard/chamadosSetor';
+      const url = this.filter === 'Categorias' ? 'https://apichamados.onrender.com/api/dashboard/chamadosCategoria' : 'https://apichamados.onrender.com/api/dashboard/chamadosSetor';
       const params = {
         data_inicial: '2024-01-01',
         data_final: '2024-12-31'
