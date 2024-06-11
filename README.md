@@ -57,7 +57,10 @@ To build your project for production, use:
 yarn build
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+```NPM
+npm run dev
+```
+
 
 Once the build process is completed, your application will be ready for deployment in a production environment.
 
