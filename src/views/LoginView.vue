@@ -53,7 +53,6 @@ async function login() {
     }
   } catch (error) {
     errorMessage.value = error?.response?.data?.error || 'Erro ao fazer login, por favor tente novamente.';
-    console.log(error?.response?.data)
   }
 }
 </script>

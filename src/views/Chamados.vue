@@ -193,7 +193,6 @@ export default {
       if (loading.value) return;
       loading.value = true;
       let prefix = permission === 'default' ? 'meusChamados' : 'chamados';
-      console.log('prefix' + prefix)
       try {
         const response = await http.get(`/${prefix}`, {
           headers: {

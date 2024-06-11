@@ -4,7 +4,19 @@
       <v-spacer></v-spacer>
     </v-card-title>
     <v-divider></v-divider>
-    <v-card-text v-if="user">
+    
+    <!-- Exibir loading proporcionalmente dentro do card -->
+    <div v-if="isLoading" class="loading-container">
+      <v-progress-circular
+        :size="100"
+        :width="10"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+    </div>
+    
+    <!-- Exibir conteúdo do perfil quando não estiver carregando -->
+    <v-card-text v-else-if="user">
       <v-alert v-if="alertMessage" type="error" dense dismissible>
         {{ alertMessage }}
         <template v-slot:close>
@@ -112,6 +124,8 @@ export default {
     const auth = useAuth();
     const bearer = `Bearer ${auth.token}`;
 
+    const isLoading = ref(true);
+
     const user = ref(null);
     const userCopy = ref({});
     const loading = ref(false);
@@ -138,6 +152,8 @@ export default {
 
     const fetchUserData = async () => {
       try {
+        isLoading.value = true;
+
         const response = await http.get(`user/${props.userId}`, {
           headers: {
             Authorization: bearer
@@ -145,8 +161,11 @@ export default {
         });
         user.value = response.data.result;
         userCopy.value = { ...response.data.result };
+        isLoading.value = false;
       } catch (error) {
         console.error('Error fetching user data:', error);
+      }finally {
+        isLoading.value = false;
       }
     };
 
@@ -233,6 +252,7 @@ export default {
 
     return {
       user,
+      isLoading,
       userCopy,
       loading,
       profilePic,
@@ -277,5 +297,12 @@ export default {
 .profile-description {
   font-size: 12px;
   color: #888;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px; /* Altura do container de carregamento */
 }
 </style>

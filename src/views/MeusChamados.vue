@@ -18,7 +18,6 @@ const page = ref(1);
 const limit = 20;
 const loading = ref(false); // Declare a variável loading
 const bearer = `Bearer ${auth.token}`;
-console.log(bearer)
 const chamados = ref([]);
 
 const loadChamados = async () => {

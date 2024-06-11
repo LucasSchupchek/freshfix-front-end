@@ -26,11 +26,6 @@
         <v-row class="dashboard_shadow">
           <HorizontalBarChart />
         </v-row>
-
-        <h1>Logs do sistema</h1>
-        <v-row class="dashboard_shadow">
-          <LogList :logs="logs" />
-        </v-row>
       </v-container>
     </v-container>
   </v-main>

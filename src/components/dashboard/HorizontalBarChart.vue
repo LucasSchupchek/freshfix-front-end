@@ -5,7 +5,13 @@
   <script>
   import { Bar } from 'vue-chartjs'
   import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js'
+  import http from '@/services/http.js';
   
+  import { useAuth } from '@/stores/auth.js';
+
+  const auth = useAuth();
+  const bearer = `Bearer ${auth.token}`;
+
   ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend)
   
   export default {
@@ -15,12 +21,7 @@
     },
     data() {
       return {
-        rawData: [
-          { name: 'Técnico A', chamados: 5 },
-          { name: 'Técnico B', chamados: 10 },
-          { name: 'Técnico C', chamados: 3 },
-          { name: 'Técnico D', chamados: 8 }
-        ],
+        rawData: [],
         options: {
           responsive: true,
           maintainAspectRatio: false,
@@ -30,6 +31,29 @@
               beginAtZero: true
             }
           }
+        }
+      }
+    },
+    mounted() {
+      this.fetchChartData();
+    },
+    methods: {
+      async fetchChartData() {
+        try {
+          const response = await http.get('/dashboard/chamadosTecnicos', {
+            headers: {
+              Authorization: bearer
+            }
+          })
+          console.log('oioioi' + JSON.stringify(response))
+          this.rawData = response.data.result.map(item => {
+            return {
+              name: item.nome_usuario,
+              chamados: item.quantidade_chamados
+            };
+          });
+        } catch (error) {
+          console.error('Erro ao buscar dados do gráfico:', error);
         }
       }
     },
@@ -50,6 +74,7 @@
     }
   }
   </script>
+  
   
   <style scoped>
   .chart-container {
