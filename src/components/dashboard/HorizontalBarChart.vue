@@ -45,7 +45,6 @@
               Authorization: bearer
             }
           })
-          console.log('oioioi' + JSON.stringify(response))
           this.rawData = response.data.result.map(item => {
             return {
               name: item.nome_usuario,

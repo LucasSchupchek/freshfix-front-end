@@ -80,9 +80,7 @@ export default {
         }
       })
         .then(response => {
-          console.log(response.data.result); // Verificar os dados recebidos da API
           const dados = response.data.result;
-          console.log(this.filter);
           if (this.filter === 'Categorias') {
             this.categoryData.labels = dados.map(el => el.descricao_categoria);
             this.categoryData.datasets[0].backgroundColor = dados.map(el => el.cor_categoria);

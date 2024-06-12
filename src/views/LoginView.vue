@@ -37,6 +37,8 @@ const user = reactive({
 
 async function login() {
   try {
+    console.log('VITE_HOST_API:', import.meta.env.VITE_HOST_API);
+    console.log('VITE_HOST_API:', process.env.VITE_HOST_API);
     const data = await http.post('/login', {
       user: user.email,
       password: user.password

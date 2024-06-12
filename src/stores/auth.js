@@ -19,7 +19,6 @@ export const useAuth = defineStore('auth', () => {
     }
 
     function setProfilePath(pathValue) {
-        console.log(pathValue)
         localStorage.setItem('ProfilePath', pathValue);
         ProfilePath.value = pathValue;
     }
@@ -44,13 +43,11 @@ export const useAuth = defineStore('auth', () => {
     async function checkToken() {
         try {
             const tokenAuth = `Bearer ${token.value}`;
-            console.log(tokenAuth)
             const {data} = await http.get('/verify', {
                 headers: {
                     Authorization: tokenAuth
                 }
             });
-            console.log('data auth verify:' + data)
             return data;
         } catch(error) {
             console.log(error.response.data)
