@@ -11,9 +11,9 @@
         </template>
 
         <v-list-item link to="usuarios" prepend-icon="mdi-account-circle" title="Usuários"></v-list-item>
-        <v-list-item link to="setores" prepend-icon="mdi mdi-cog" title="Setores"></v-list-item>
-        <v-list-item link to="cargos" prepend-icon="mdi mdi-cog" title="Cargos"></v-list-item>
-        <v-list-item link to="categoria" prepend-icon="mdi mdi-cog" title="Categorias"></v-list-item>
+        <v-list-item link to="setores" prepend-icon="mdi mdi-database-marker" title="Setores"></v-list-item>
+        <v-list-item link to="cargos" prepend-icon="mdi mdi-book-account" title="Cargos"></v-list-item>
+        <v-list-item link to="categoria" prepend-icon="mdi mdi-pin" title="Categorias"></v-list-item>
       </v-list-group>
     </v-list>
     <!-- <router-link to="NovoChamado"> -->

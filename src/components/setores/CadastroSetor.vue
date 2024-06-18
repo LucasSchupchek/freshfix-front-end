@@ -6,11 +6,13 @@
         <v-text-field
           v-model="setorCopy.descricao"
           label="Descrição"
+          :rules="[rules.required]"
           required
         ></v-text-field>
         <v-text-field
           v-model="setorCopy.localizacao"
           label="Localização"
+          :rules="[rules.required]"
           required
         ></v-text-field>
       </v-form>
@@ -69,10 +71,9 @@ export default {
     const salvar = async () => {
       form.value.validate();
       if (!isFormValid.value) {
-        alert('Por favor, preencha todos os campos obrigatórios corretamente.');
+  
         return;
       }
-      console.log('valooorororo' + JSON.stringify(setorCopy.value))
       loading.value = true;
       try {
         if (props.isEdit) {
@@ -87,7 +88,6 @@ export default {
         fecharDialog();
         emit('setor-salvo');
       } catch (error) {
-        console.error('Erro ao salvar setor:', error);
         alert(`Erro ao salvar setor: ${error.response?.data?.error || error.message}`);
       } finally {
         loading.value = false;

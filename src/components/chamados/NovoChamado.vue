@@ -86,7 +86,7 @@ export default {
 
     const listarCategorias = async () => {
       try {
-        const response = await http.get('/categorias', {
+        const response = await http.get('/categorias/ativos', {
           headers: {
             Authorization: bearer
           }

@@ -180,7 +180,7 @@ export default {
 
     const loadSetores = async () => {
       try {
-        const response = await http.get('/setores', {
+        const response = await http.get('/setores/ativos', {
           headers: { Authorization: bearer }
         });
         setores.value = response.data.result.data.map(item => ({ id: item.id, descricao: item.descricao }));
@@ -191,7 +191,7 @@ export default {
 
     const loadCargos = async () => {
       try {
-        const response = await http.get('/cargos', {
+        const response = await http.get('/cargos/ativos', {
           headers: { Authorization: bearer }
         });
         cargos.value = response.data.result.data.map(item => ({ id: item.id, descricao: item.descricao }));
