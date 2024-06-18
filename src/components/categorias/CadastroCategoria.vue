@@ -6,12 +6,14 @@
           <v-text-field
             v-model="categoriaCopy.descricao"
             label="Descrição"
+            :rules="[rules.required]"
             required
           ></v-text-field>
           <v-text-field
             v-model="categoriaCopy.cor"
             label="Cor"
             readonly
+            :rules="[rules.required]"
             append-icon="mdi-palette"
             @click:append="colorPickerVisible = true"
           ></v-text-field>
@@ -92,7 +94,7 @@
       const salvar = async () => {
         form.value.validate();
         if (!isFormValid.value) {
-          alert('Por favor, preencha todos os campos obrigatórios corretamente.');
+          
           return;
         }
         console.log('Categoria:', JSON.stringify(categoriaCopy.value));

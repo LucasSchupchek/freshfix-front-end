@@ -6,6 +6,7 @@
           <p class="message-text">{{ message.text }}</p>
         </v-chip>
         <p class="message-author">{{ message.author }}:</p>
+        <p class="message-data">{{ formatMessageDate(message.data) }}:</p>
       </div>
     </div>
     <div class="input-container">
@@ -19,6 +20,7 @@
         clearable
         @click:append="sendMessage"
         @keyup.enter="sendMessage"
+        :disabled="!canSendMessage"
       ></v-text-field>
     </div>
   </v-card>
@@ -34,7 +36,8 @@ const bearer = `Bearer ${auth.token}`;
 
 export default {
   props: {
-    chamado_id: Number
+    chamado_id: Number,
+    canSendMessage: Boolean
   },
   data() {
     return {
@@ -46,7 +49,18 @@ export default {
     };
   },
   methods: {
+    formatMessageDate(dateString) {
+      const date = new Date(dateString);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const seconds = date.getSeconds().toString().padStart(2, '0');
+      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    },
     sendMessage() {
+      if (!this.canSendMessage) return;
       if (this.newMessage.trim() !== '') {
         this.socket.emit('message', {
           text: this.newMessage,
@@ -97,7 +111,8 @@ export default {
         console.log(messages)
         this.messages = messages.map(message => ({
           text: message.descricao,
-          author: message.id_usuario === this.userAppId ? this.userName : 'Outro Usuário'
+          author: message.id_usuario === this.userAppId ? this.userName : message.nome,
+          data: message.data_inclusao
         }));
 
         this.$nextTick(() => {
@@ -158,6 +173,10 @@ export default {
 
 .message-author {
   font-size: 12px; /* Define o tamanho da fonte para 12px */
+}
+
+.message-data {
+  font-size: 10px; /* Define o tamanho da fonte para 12px */
 }
 
 .message-text {

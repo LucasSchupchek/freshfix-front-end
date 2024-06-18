@@ -62,11 +62,11 @@ export default {
     });
 
     const salvar = async () => {
-      if (!cargoCopy.value.descricao) {
-        isFormValid.value = false;
+      form.value.validate();
+      if (!isFormValid.value) {
+
         return;
       }
-      isFormValid.value = true;
 
       loading.value = true;
       try {

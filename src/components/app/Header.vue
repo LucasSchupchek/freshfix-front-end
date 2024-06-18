@@ -4,11 +4,11 @@
     <v-app-bar-title>FreshFix</v-app-bar-title>
 
     <template #append>
-      <v-btn icon class="mr-2">
+      <!-- <v-btn icon class="mr-2">
         <v-badge dot color="info">
           <v-icon icon="mdi-bell-outline"></v-icon>
         </v-badge>
-      </v-btn>
+      </v-btn> -->
 
       <v-menu v-if="isUserLoggedIn">
         <template #activator="{ props }">

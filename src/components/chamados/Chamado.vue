@@ -65,7 +65,7 @@
           </v-card>
 
             <v-card-title class="headline">Chat</v-card-title>
-            <Chat class="pa-4 mb-4" style="margin-bottom: 16px;" :chamado_id="chamado.id" />
+            <Chat class="pa-4 mb-4" style="margin-bottom: 16px;" :chamado_id="chamado.id" :can-send-message="canSendMessage" />
         </v-col>
         <!-- Coluna da Direita (25%) -->
         <v-col cols="3">
@@ -107,9 +107,19 @@ export default {
       novoStatus: '',
       statusOptions: ['Em andamento', 'Pendente', 'Fechado'],
       defaultImage, // Importa a imagem padrão
+      canSendMessage: true
     };
   },
+  mounted() {
+    this.updateCanSendMessage();
+  },
+  watch: {
+  'chamado.status': 'updateCanSendMessage'
+  },
   methods: {
+    updateCanSendMessage() {
+    this.canSendMessage = this.chamado.status !== 'Fechado' && this.chamado.id_responsavel === auth.user.id;
+  },
     formatDate(date) {
       if (!date) return 'N/A';
       return new Date(date).toLocaleString();
@@ -131,7 +141,7 @@ export default {
             Authorization: bearer
           }
         });
-        this.chamado.id_responsavel = auth.user.id;; // Atualiza o responsável no frontend
+        this.chamado.id_responsavel = auth.user.id; // Atualiza o responsável no frontend
         this.$emit('fechar-dialog');
       } catch (error) {
         console.error('Erro ao atribuir chamado:', error);
