@@ -74,7 +74,7 @@
             <v-card-text>
               <div><strong>Nome:</strong> {{ chamado.usuario }}</div>
               <div><strong>Email:</strong> {{ chamado.email_usuario }}</div>
-              <div><strong>Setor:</strong> {{ chamado.setor_usuario }}</div>
+              <div><strong>Setor:</strong> {{ chamado.setor_usuario }} {{ chamado.id_usuario }}</div>
             </v-card-text>
           </v-card>
           <v-card class="pa-4 .mb-4" outlined>
@@ -118,7 +118,7 @@ export default {
   },
   methods: {
     updateCanSendMessage() {
-    this.canSendMessage = this.chamado.status !== 'Fechado' && this.chamado.id_responsavel === auth.user.id;
+    this.canSendMessage = this.chamado.status !== 'Fechado' && (this.chamado.id_responsavel === auth.user.id || this.chamado.id_usuario === auth.user.id) ;
   },
     formatDate(date) {
       if (!date) return 'N/A';
